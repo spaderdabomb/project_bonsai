@@ -74,6 +74,8 @@ public static class SettingsData
         Inventory8,
         Inventory9,
         Inventory10,
+        Attack,
+        Block,
     }
 }
 
@@ -87,9 +89,9 @@ public static class ItemData
         // Item Data
         itemDict = new Dictionary<ItemEnum, ItemStruct>
         {
-            { ItemEnum.LogNormal, new ItemStruct("LogNormal", "LogNormalUI", "LogNormal3D", "LogNormalAnim", false, false, ItemType.Material, -1f, false, "Its a normal log") },
-            { ItemEnum.Rock, new ItemStruct("Rock", "RockUI", "Rock3D", "RockNormalAnim", false, false, ItemType.Material, -1f, false, "Its a rock") },
-            { ItemEnum.AxeStone, new ItemStruct("AxeStone", "AxeStoneUI", "AxeStone3D", "AxeStoneAnim", false, false, ItemType.Tool, 100f, false, "Its a stone axe") }
+            { ItemEnum.LogNormal, new ItemStruct("LogNormal", "LogNormalUI", "LogNormal3D", "LogNormalAnim", false, false, ItemType.Material, 1f, -1f, -1f, false, "Its a normal log") },
+            { ItemEnum.Rock, new ItemStruct("Rock", "RockUI", "Rock3D", "RockNormalAnim", false, false, ItemType.Material, 1f, -1f, -1f, false, "Its a rock") },
+            { ItemEnum.AxeStone, new ItemStruct("AxeStone", "AxeStoneUI", "AxeStone3D", "AxeStoneAnim", false, false, ItemType.Tool, 5f, -1f, 100f, false, "Its a stone axe") }
         };
     }
 
@@ -124,16 +126,18 @@ public static class ItemData
         public string name;
         public string uiIconRef;
         public string modelRef;
+        public string animation;
         public bool questItem;
         public bool consumable;
         public ItemType itemType;
+        public float damage;
+        public float armor;
         public float durability;
         public bool aiUsable;
-        public string animation;
         public string description;
 
         public ItemStruct(string _name, string _uiIconRef, string _modelRef, string _animation, bool _questItem, bool _consumable, ItemType _itemType,
-                          float _durability, bool _aiUsable, string _description)
+                          float _damage, float _armor, float _durability, bool _aiUsable, string _description)
         {
             name = _name;
             uiIconRef = _uiIconRef;
@@ -142,6 +146,8 @@ public static class ItemData
             questItem = _questItem;
             consumable = _consumable;
             itemType = _itemType;
+            damage = _damage;
+            armor = _armor;
             durability = _durability;
             aiUsable = _aiUsable;
             description = _description;
