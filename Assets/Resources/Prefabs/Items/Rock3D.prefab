@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 7949036484944131736}
   - component: {fileID: -4628375377517542211}
   m_Layer: 0
-  m_Name: CobbleRock_E
+  m_Name: Rock3D
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -158,7 +158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89e20da9e23fbcb449dea3fd39f59d9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: rock
+  itemName: Rock
+  itemEnum: 1
 --- !u!1 &7949036484924641626
 GameObject:
   m_ObjectHideFlags: 0

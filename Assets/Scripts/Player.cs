@@ -47,7 +47,7 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.tag == "SubItem" && !foundSubItem)
                 {
                     GameObject colliderParent = Core.GetFirstParentWithTag(collider.gameObject, "Item");
-                    string itemName = colliderParent.GetComponent<Item>().itemName;
+                    string itemName = colliderParent.GetComponent<Item>().itemStruct.uiIconRef;
                     Destroy(colliderParent);
                     triggerList.Remove(collider);
                     interactPopup.GetComponent<InteractPopup>().HidePopup();

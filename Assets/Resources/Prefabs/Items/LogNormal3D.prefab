@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2084710304935250244}
   - component: {fileID: 157417117677134779}
   m_Layer: 0
-  m_Name: Three firewoods
+  m_Name: LogNormal3D
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89e20da9e23fbcb449dea3fd39f59d9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: log
+  itemName: LogNormal
+  itemEnum: 0
 --- !u!1 &2084710304935431398
 GameObject:
   m_ObjectHideFlags: 0
