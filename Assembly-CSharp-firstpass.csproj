@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>ProjectBonsai</RootNamespace>
-    <ProjectGuid>{2B2C0C14-4920-5EDE-E990-86C8F5A51900}</ProjectGuid>
+    <ProjectGuid>{69653A48-2665-1CAE-0570-4B37F235378D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
