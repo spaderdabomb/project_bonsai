@@ -8,6 +8,9 @@ TagManager:
   - SubItem
   - Controller
   - UI
+  - UIItem
+  - ItemGrid
+  - GridSpace
   layers:
   - Default
   - TransparentFX
@@ -15,7 +18,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - UIItem
   - 
   - 
   - 

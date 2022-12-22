@@ -7,6 +7,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using static SettingsData;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace ProjectBonsai
 {
@@ -16,6 +17,7 @@ namespace ProjectBonsai
 
         [SerializeField] GameObject keybindMenuMovement, keybindMenuEquipment;
         [SerializeField] GameObject PressAnyKeyPanel;
+        [SerializeField] GameObject toolHolder;
         private GameObject currentKeycodeField;
         private GameObject[] keybindMenus;
         private int currentKeycodeColumn;
@@ -32,12 +34,15 @@ namespace ProjectBonsai
             }
             DontDestroyOnLoad(gameObject);
             Instance = this;
+
+            // Call these to setup early
+            InitSettingsData();
+            InitKeybinds();
         }
 
         void Start()
         {
-            InitSettingsData();
-            InitKeybinds();
+
         }
 
         private void InitSettingsData()
@@ -62,8 +67,7 @@ namespace ProjectBonsai
                 { KeyBindType.Inventory6, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 6", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Inventory7, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 7", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Inventory8, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 8", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
-                { KeyBindType.Inventory9, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 9", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
-                { KeyBindType.Inventory10, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 10", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
+                { KeyBindType.Inventory9, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Inventory 9", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) }
             };
 
             if (keybindData.Count != SettingsData.defaultKeybinds.Count)
@@ -127,20 +131,10 @@ namespace ProjectBonsai
             {
                 foreach (KeyValuePair<KeyBindType, Tuple<string, KeyCode, KeyCode, GameObject, GameObject>> entry in keybindData)
                 {
-                    string keyValueStr;
                     KeyCode[] keybindItems = new KeyCode[2] { entry.Value.Item2, entry.Value.Item3} ;
-
-                    if (keybindItems[i] is KeyCode.None)
-                    {
-                        keyValueStr = "-";
-                    }
-                    else
-                    {
-                        keyValueStr = keybindItems[i].ToString();
-                    }
-
+                    string keyCodeStr = SettingsData.keyNames[keybindItems[i]];
                     TMP_Text[] keyValueText = new TMP_Text[2] { entry.Value.Item4.GetComponent<TextMeshProUGUI>(), entry.Value.Item5.GetComponent<TextMeshProUGUI>() };
-                    keyValueText[i].text = keyValueStr;
+                    keyValueText[i].text = keyCodeStr;
                 }
             }
         }
@@ -160,6 +154,7 @@ namespace ProjectBonsai
             EventController.OnKeyPress -= KeyCodePressed;
         }
 
+        // Fires when pressing key for new keybind
         private void KeyCodePressed()
         {
             foreach (KeyCode vKey in System.Enum.GetValues(typeof(KeyCode)))
@@ -184,6 +179,7 @@ namespace ProjectBonsai
                     PressAnyKeyPanel.SetActive(false);
                 }
             }
+            UpdateAllKeybindText();
         }
 
         public void KeyCodeButtonPressed(GameObject keycodeField, int keycodeColumn)
@@ -199,6 +195,22 @@ namespace ProjectBonsai
             KeyCode[] returnStuff = new KeyCode[] { primaryKeyCode, secondaryKeyCode };
 
             return returnStuff;
+        }
+
+        public KeyCode GetCurrentKeybind(KeyBindType keybindType)
+        {
+            KeyCode keyCode = keybindData[keybindType].Item2;
+            if (keyCode == KeyCode.None)
+            {
+                keyCode = keybindData[keybindType].Item3;
+            }
+
+            return keyCode;
+        }
+
+        public void UpdateAllKeybindText()
+        {
+            toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().UpdateAllKeybinds();
         }
     }
 }

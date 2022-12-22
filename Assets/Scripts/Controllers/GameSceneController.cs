@@ -20,6 +20,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         [SerializeField] public GameObject mainMenu, settingsMenu;
         [SerializeField] public GameObject dimBg;
         [SerializeField] public GameObject toolHolder, inventory;
+        [SerializeField] public Camera mainCamera;
 
         int currentSpawnIndex = 0;
 
@@ -64,19 +65,29 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
 
         public void EscapePressed()
         {
-            bool activeState = !mainMenu.activeSelf;
-            mainMenu.SetActive(activeState);
-            dimBg.SetActive(activeState);
+            bool mainMenuActiveState = mainMenu.activeSelf;
+            bool settingsMenuActiveState = settingsMenu.activeSelf;
 
-            if (mainMenu.activeSelf || settingsMenu.activeSelf)
+            if (!mainMenuActiveState && !settingsMenuActiveState)
             {
+                mainMenu.SetActive(true);
+                dimBg.SetActive(true);
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
+                player.GetComponent<FirstPersonController>().enabled = false;
+            }
+            else if (settingsMenu.activeSelf)
+            {
+                settingsMenu.SetActive(false);
+                mainMenu.SetActive(true);
+                dimBg.SetActive(true);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                player.GetComponent<FirstPersonController>().enabled = false;
             }
             else
             {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
+                ResumePlayState();
             }
         }
 
@@ -86,7 +97,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             {
                 if (Input.GetKey(vKey))
                 {
-                    //TODO: fix this
                     var keybindType = SettingsController.Instance.keybindData.FirstOrDefault(x => x.Value.Item2 == vKey).Key;
                     HandleKeyPress(keybindType);
                 }
@@ -102,13 +112,12 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             else if (Core.Contains(SettingsData.inventoryKeyBindTypes, keybindType))
             {
                 int toolHolderIndex = Core.GetIndex(SettingsData.inventoryKeyBindTypes, keybindType);
-                toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().toggleGOs[toolHolderIndex].GetComponent<Toggle>().isOn = true;
+                toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().gridSpaces[toolHolderIndex].GetComponent<Toggle>().isOn = true;
             }
             else if (keybindType == SettingsData.KeyBindType.ShowInventory)
             {
                 bool activeState = !inventory.activeSelf;
                 inventory.SetActive(activeState);
-                // dimBg.SetActive(activeState);
 
                 if (inventory.activeSelf)
                 {
@@ -125,11 +134,14 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             }
         }
 
-        public void BeginPlayState()
+        public void ResumePlayState()
         {
+            mainMenu.SetActive(false);
+            settingsMenu.SetActive(false);
+            dimBg.SetActive(false);
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            Time.timeScale = 1;
+            player.GetComponent<FirstPersonController>().enabled = true;
         }
 
         private void OnEnable()

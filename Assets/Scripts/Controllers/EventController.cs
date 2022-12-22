@@ -13,6 +13,9 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         public delegate void ClickAction();
         public static event ClickAction OnClicked;
 
+        public delegate void MouseDownAction();
+        public static event MouseDownAction MouseDown;
+
         public delegate void RAction();
         public static event RAction OnR;
 
@@ -45,6 +48,11 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 foreach (RaycastResult result in GetEventSystemRaycastResults())
                 {
                     // print(result);
+                }
+
+                if (MouseDown != null)
+                {
+                    MouseDown();
                 }
 
                 if (OnClicked != null)
@@ -88,7 +96,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 RaycastResult curRaysastResult = eventSystemRaysastResults[index];
                 if (curRaysastResult.gameObject.layer == UILayer)
                 {
-                    print("he");
                     return true;
                 }
             }
