@@ -7,15 +7,18 @@ public class Item : MonoBehaviour
     [SerializeField] public string itemName;
     [SerializeField] public ItemData.ItemEnum itemEnum;
     [SerializeField] public ItemData.ItemStruct itemStruct;
+
+    [SerializeField] public int itemQuantity = 1;
+
     void Start()
     {
         itemStruct = ItemData.itemDict[itemEnum];
         itemName = itemStruct.name;
     }
 
-    protected virtual void InitializeEnemy()
+    public void SetNumItem(int _itemQuantity)
     {
-
+        itemQuantity = _itemQuantity;
     }
 
     void Update()

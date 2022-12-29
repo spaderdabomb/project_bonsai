@@ -195,5 +195,5 @@ MonoBehaviour:
   _rows: 1
   _columns: 10
   alreadyInstantiated: 1
-  toggleGOs: []
+  gridSpaces: []
   keybindTexts: []

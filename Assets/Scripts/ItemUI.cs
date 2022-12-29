@@ -12,11 +12,8 @@ namespace ProjectBonsai
         [SerializeField] public ItemData.ItemEnum itemEnum;
         [SerializeField] public ItemData.ItemStruct itemStruct;
 
-        public GameObject gridParent;
-        public Vector2 startPosition;
+        [HideInInspector] public Vector2 startPosition;
 
-        private GameObject itemGridGO;
-        ItemGrid itemGrid;
         Canvas itemUICanvas;
 
         private void Awake()
@@ -28,10 +25,7 @@ namespace ProjectBonsai
         void Start()
         {
             startPosition = transform.position;
-            gridParent = transform.parent.gameObject;
             itemStruct = ItemData.itemDict[itemEnum];
-            itemGridGO = Core.GetFirstParentWithTag(this.gameObject, "ItemGrid");
-            itemGrid = itemGridGO.GetComponent<ItemGrid>();
         }
 
         // Update is called once per frame
@@ -39,6 +33,16 @@ namespace ProjectBonsai
         {
         
         }
+        public GameObject GetGridSpaceUIParent()
+        {
+            return Core.GetFirstParentWithTag(this.gameObject, "GridSpace");
+        }
+
+        public GameObject GetItemGridParent()
+        {
+            return Core.GetFirstParentWithTag(this.gameObject, "GridSpace");
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             startPosition = transform.position;
@@ -47,6 +51,8 @@ namespace ProjectBonsai
         public void OnDrag(PointerEventData eventData)
         {
             transform.position = Input.mousePosition;
+            GameObject gridSpaceParent = GetGridSpaceUIParent();
+            gridSpaceParent.GetComponent<GridSpaceUI>().quantityText.transform.position = Input.mousePosition + gridSpaceParent.GetComponent<GridSpaceUI>().quantityTextOffset;
             this.gameObject.GetComponent<Image>().raycastTarget = false;
 
         }
@@ -54,8 +60,9 @@ namespace ProjectBonsai
         public void OnEndDrag(PointerEventData eventData)
         {
             this.gameObject.GetComponent<Image>().raycastTarget = true;
-            this.transform.SetParent(gridParent.transform);
             transform.position = startPosition;
+            GameObject gridSpaceParent = GetGridSpaceUIParent();
+            gridSpaceParent.GetComponent<GridSpaceUI>().quantityText.transform.localPosition = gridSpaceParent.GetComponent<GridSpaceUI>().quantityTextOffset;
         }
     }
 }

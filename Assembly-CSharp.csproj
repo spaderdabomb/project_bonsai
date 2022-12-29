@@ -163,6 +163,7 @@
     <Compile Include="Assets\Imported\Standard Assets\CrossPlatformInput\Scripts\TouchPad.cs" />
     <Compile Include="Assets\Imported\Standard Assets\ParticleSystems\Scripts\SmokeParticles.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Attributes\MinAttribute.cs" />
+    <Compile Include="Assets\Scripts\ItemMaterialUI.cs" />
     <Compile Include="Assets\Imported\Standard Assets\CrossPlatformInput\Scripts\TiltInput.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Components\BloomComponent.cs" />
     <Compile Include="Assets\Imported\Standard Assets\Cameras\Scripts\AutoCam.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Assets\Imported\Standard Assets\Utility\FPSCounter.cs" />
     <Compile Include="Assets\Imported\Standard Assets\Utility\SimpleActivatorMenu.cs" />
     <Compile Include="Assets\Imported\SampleScenes\Scripts\ParticleSceneControls.cs" />
+    <Compile Include="Assets\Scripts\ScriptableItem.cs" />
     <Compile Include="Assets\Imported\Standard Assets\Utility\SimpleMouseRotator.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Attributes\GetSetAttribute.cs" />
     <Compile Include="Assets\Scripts\SettingsKeybind.cs" />
@@ -215,6 +217,7 @@
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Utils\RenderTextureFactory.cs" />
     <Compile Include="Assets\Imported\Standard Assets\Utility\FOVKick.cs" />
     <Compile Include="Assets\Scripts\ButtonOverride.cs" />
+    <Compile Include="Assets\Scripts\CraftingSubmenuUI.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Components\EyeAdaptationComponent.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Models\ColorGradingModel.cs" />
     <Compile Include="Assets\Imported\Flooded_Grounds\PostProcessing\Runtime\Models\ScreenSpaceReflectionModel.cs" />

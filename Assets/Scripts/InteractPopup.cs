@@ -9,6 +9,7 @@ namespace ProjectBonsai
     public class InteractPopup : MonoBehaviour
     {
         [SerializeField] TextMeshProUGUI keyBindLabel;
+        [SerializeField] TextMeshProUGUI interactObjectText;
         void Start()
         {
 
@@ -20,7 +21,11 @@ namespace ProjectBonsai
         
         }
 
-        public void ShowPopup()
+        /// <summary>
+        /// Shows keybind popup for interacting
+        /// </summary>
+        /// <param name="itemGameObj"> 3D item model game object </param>
+        public void ShowPopup(GameObject itemGameObj)
         {
             this.gameObject.SetActive(true);
             KeyCode[] keyBind = SettingsController.Instance.GetCurrentKeyCode(SettingsData.KeyBindType.Interact);
@@ -31,13 +36,15 @@ namespace ProjectBonsai
             }
             else if (keyBind[0] == KeyCode.None)
             {
-                keyBindStr = keyBind[1].ToString();
+                keyBindStr = SettingsData.keyNames[keyBind[1]].ToString();
             }
             else
             {
-                keyBindStr = keyBind[0].ToString();
+                keyBindStr = SettingsData.keyNames[keyBind[0]].ToString();
             }
-            keyBindLabel.text = keyBind[0].ToString();
+            keyBindLabel.text = "[" + "<color=" + GlobalData.uiOrangeStandardHex + ">"+keyBindStr + "</color>" + "] Pick up";
+            string itemStr = ItemData.itemDict[itemGameObj.GetComponent<Item>().itemEnum].name + " x" + itemGameObj.GetComponent<Item>().itemQuantity.ToString();
+            interactObjectText.text = itemStr;
         }
 
         public void HidePopup()

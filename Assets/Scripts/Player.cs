@@ -46,14 +46,27 @@ public class Player : MonoBehaviour
             {
                 if (collider.gameObject.tag == "SubItem" && !foundSubItem)
                 {
+                    // Get reference values
                     GameObject colliderParent = Core.GetFirstParentWithTag(collider.gameObject, "Item");
-                    string itemName = colliderParent.GetComponent<Item>().itemStruct.uiIconRef;
-                    Destroy(colliderParent);
-                    triggerList.Remove(collider);
-                    interactPopup.GetComponent<InteractPopup>().HidePopup();
+                    Item colliderItem = colliderParent.GetComponent<Item>();
+                    ItemData.ItemStruct itemStruct = colliderItem.itemStruct;
+                    ItemData.ItemEnum itemEnum = colliderItem.itemEnum;
+                    int itemQuantity = colliderItem.itemQuantity;
 
-                    int firstAvailableIndex = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
-                    GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().InstantiateItem(itemName, firstAvailableIndex);
+                    // Remove item model and add item UI
+                    int leftOverItemQuantity = GameSceneController.Instance.AddUIItem(itemEnum, itemQuantity);
+                    if (leftOverItemQuantity == 0)
+                    {
+                        Destroy(colliderParent);
+                        triggerList.Remove(collider);
+                        interactPopup.GetComponent<InteractPopup>().HidePopup();
+                    }
+                    // When model remains, create new quantity
+                    else
+                    {
+                        colliderParent.GetComponent<Item>().itemQuantity = leftOverItemQuantity;
+                        interactPopup.GetComponent<InteractPopup>().ShowPopup(colliderParent);
+                    }
                     foundSubItem = true;
                 }
                 else
@@ -65,6 +78,37 @@ public class Player : MonoBehaviour
 
     }
 
+    // Searches toolholder than inventory for available slot to add item
+    public (GameObject itemGrid, int itemIndex) GetIndexToAddItem(ItemData.ItemEnum itemEnum)
+    {
+        int indexToAdd;
+        GameObject itemGrid;
+        bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+        bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+        if (itemExistsInToolholder)
+        {
+            indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+            itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+        }
+        else if (itemExistsInInventory)
+        {
+            indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+            itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+        }
+        else
+        {
+            indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+            itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+            if (indexToAdd == -1)
+            {
+                indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+                itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+            }
+        }
+
+        return (itemGrid, indexToAdd);
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (!triggerList.Contains(other))
@@ -74,7 +118,7 @@ public class Player : MonoBehaviour
                 GameObject colliderParent = other.transform.parent.gameObject;
                 if (colliderParent.tag == "Item")
                 {
-                    interactPopup.GetComponent<InteractPopup>().ShowPopup();
+                    interactPopup.GetComponent<InteractPopup>().ShowPopup(colliderParent);
                 }
             }
             triggerList.Add(other);

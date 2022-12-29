@@ -8,6 +8,8 @@ namespace ProjectBonsai
     {
         [SerializeField] public GameObject currentItem;
         [SerializeField] public GameObject itemName;
+
+        public ItemData.ItemEnum itemEnumType;
         void Start()
         {
         

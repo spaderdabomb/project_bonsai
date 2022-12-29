@@ -9,6 +9,7 @@ using static SettingsData;
 using System.Reflection;
 using System;
 using UnityStandardAssets.Characters.FirstPerson;
+using static ItemData;
 
 namespace ProjectBonsai.Assets.Scripts.Controllers
 {
@@ -19,7 +20,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         [SerializeField] GameObject SettingsMenuController;
         [SerializeField] public GameObject mainMenu, settingsMenu;
         [SerializeField] public GameObject dimBg;
-        [SerializeField] public GameObject toolHolder, inventory;
+        [SerializeField] public GameObject toolHolder, inventory, craftingMenu, playerMenu;
         [SerializeField] public Camera mainCamera;
 
         int currentSpawnIndex = 0;
@@ -43,7 +44,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             SettingsMenuController.SetActive(false);
         }
 
-        // Update is called once per frame
         void Update()
         {
 
@@ -116,14 +116,17 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             }
             else if (keybindType == SettingsData.KeyBindType.ShowInventory)
             {
-                bool activeState = !inventory.activeSelf;
-                inventory.SetActive(activeState);
+                bool activeState = !inventory.GetComponent<Canvas>().enabled;
+                inventory.GetComponent<Canvas>().enabled = activeState;
+                craftingMenu.GetComponent<Canvas>().enabled = activeState;
+                playerMenu.GetComponent<Canvas>().enabled = activeState;
 
-                if (inventory.activeSelf)
+                if (inventory.GetComponent<Canvas>().enabled)
                 {
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
                     player.GetComponent<FirstPersonController>().enabled = false;
+                    CraftingMenuController.Instance.ShowCraftingSubMenu(CraftingMenuController.Instance.GetCurrentSelectedItemToggle());
                 }
                 else
                 {
@@ -143,6 +146,154 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             Cursor.lockState = CursorLockMode.Locked;
             player.GetComponent<FirstPersonController>().enabled = true;
         }
+
+        /// <summary>
+        /// Assumes a 3D model will appear on the ground if there is no space
+        /// </summary>
+        /// <param name="itemEnum"></param>
+        /// <param name="itemQuantity"></param>
+        /// <returns></returns>
+        public int AddUIItem(ItemData.ItemEnum itemEnum, int itemQuantity)
+        {
+            (GameObject itemGrid, int firstAvailableIndex) = GetIndexToAddItem(itemEnum);
+            int leftoverItemQuantity = itemQuantity;
+            if (firstAvailableIndex != -1)
+            {
+                leftoverItemQuantity = itemGrid.GetComponent<ItemGrid>().InstantiateItem(itemEnum, firstAvailableIndex, itemQuantity);
+            }
+
+            // If we overflowed from first itemgrid to second itemgrid
+            if (leftoverItemQuantity != 0)
+            {
+                (itemGrid, firstAvailableIndex) = GetIndexToAddItem(itemEnum);
+                if (firstAvailableIndex != -1)
+                {
+                    leftoverItemQuantity = itemGrid.GetComponent<ItemGrid>().InstantiateItem(itemEnum, firstAvailableIndex, leftoverItemQuantity);
+                }
+            }
+
+            return leftoverItemQuantity;
+        }
+
+        /// <summary>
+        /// Assumes at least one item exists in inventory/toolholder
+        /// </summary>
+        /// <param name="itemEnum"></param>
+        /// <param name="itemQuantity"></param>
+        public void SubtractUIItem(ItemData.ItemEnum itemEnum, int itemQuantity)
+        {
+            (GameObject itemGrid, int firstAvailableIndex) = GetIndexToSubtractItem(itemEnum);
+            int gridItemQuantity = itemGrid.GetComponent<ItemGrid>().gridSpaces[firstAvailableIndex].GetComponent<GridSpaceUI>().itemQuantity;
+
+            // Doesn't destroy itemUI
+            if (gridItemQuantity > itemQuantity)
+            {
+                itemGrid.GetComponent<ItemGrid>().gridSpaces[firstAvailableIndex].GetComponent<GridSpaceUI>().SetItemQuantity(gridItemQuantity - itemQuantity);
+            }
+            // Destroys itemUIs in loop
+            else
+            {
+                int loopIndex = 0;
+                int currentItemsRemaining = itemQuantity;
+                while (currentItemsRemaining > 0)
+                {
+                    currentItemsRemaining -= gridItemQuantity;
+                    if (currentItemsRemaining >= 0)
+                    {
+                        GameObject currentItemUI = itemGrid.GetComponent<ItemGrid>().gridSpaces[firstAvailableIndex].GetComponent<GridSpaceUI>().GetCurrentItemUI();
+                        itemGrid.GetComponent<ItemGrid>().gridSpaces[firstAvailableIndex].GetComponent<GridSpaceUI>().SetItemQuantity(0);
+                        Destroy(currentItemUI);
+                    }
+                    else
+                    {
+                        itemGrid.GetComponent<ItemGrid>().gridSpaces[firstAvailableIndex].GetComponent<GridSpaceUI>().SetItemQuantity(gridItemQuantity - itemQuantity);
+                    }
+                    (itemGrid, firstAvailableIndex) = GetIndexToSubtractItem(itemEnum);
+
+                    loopIndex++;
+                    if (loopIndex > 100)
+                    {
+                        Debug.LogError("Something is fucked in ItemGrid>Instantiate Item");
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Searches toolholder than inventory for available slot to add item
+        /// Returns -1 if no free slot in either
+        /// </summary>
+        /// <param name="itemEnum"></param>
+        /// <returns></returns>
+        public (GameObject itemGrid, int itemIndex) GetIndexToAddItem(ItemData.ItemEnum itemEnum)
+        {
+            int indexToAdd;
+            GameObject itemGrid;
+            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+            bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+            if (itemExistsInToolholder)
+            {
+                indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+            }
+            else if (itemExistsInInventory)
+            {
+                indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+            }
+            else
+            {
+                indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                if (indexToAdd == -1)
+                {
+                    indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+                    itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+                }
+            }
+
+            return (itemGrid, indexToAdd);
+        }
+
+        /// <summary>
+        /// Searches toolholder than inventory for available slot to add item
+        /// Returns -1 if there are no items available to subtract
+        /// </summary>
+        /// <param name="itemEnum"></param>
+        /// <returns></returns>
+        public (GameObject itemGrid, int itemIndex) GetIndexToSubtractItem(ItemData.ItemEnum itemEnum)
+        {
+            int indexToSubtract;
+            GameObject itemGrid;
+            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+            bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+
+            if (itemExistsInToolholder)
+            {
+                indexToSubtract = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+            }
+            else if (itemExistsInInventory)
+            {
+                indexToSubtract = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+            }
+            else
+            {
+                indexToSubtract = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                if (indexToSubtract == -1)
+                {
+                    indexToSubtract = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstSlotWithItem(itemEnum);
+                    itemGrid = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid;
+                }
+            }
+
+            return (itemGrid, indexToSubtract);
+        }
+
+
 
         private void OnEnable()
         {

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6052771328624068346}
   - component: {fileID: -4385662198027505485}
   m_Layer: 6
-  m_Name: HammerUI
+  m_Name: BlankScrollUI
   m_TagString: UIItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 06823060ecdf9574cb95d1d8777c3e86, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 64a2b0e2236234644bf8da58fb8dfb49, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -91,8 +91,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9d8c3c67a6893e4f94119bda6a35be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemEnum: 1
+  itemEnum: 9
   gridParent: {fileID: 0}
+  gridSpaceParent: {fileID: 0}
   startPosition: {x: 0, y: 0}
 --- !u!223 &6052771328624068346
 Canvas:

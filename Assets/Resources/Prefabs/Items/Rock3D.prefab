@@ -159,7 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Rock
-  itemEnum: 1
+  itemEnum: 2
 --- !u!1 &7949036484924641626
 GameObject:
   m_ObjectHideFlags: 0

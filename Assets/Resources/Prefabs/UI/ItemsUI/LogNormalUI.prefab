@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 2485313300613947745}
   - component: {fileID: 8368657086215526118}
   - component: {fileID: 2920459973705124935}
-  - component: {fileID: 8532706613360574364}
-  - component: {fileID: 6052771328624068346}
-  - component: {fileID: -4385662198027505485}
+  - component: {fileID: -1826648268953939295}
+  - component: {fileID: -1182407284813567075}
+  - component: {fileID: -7947914351469050076}
   m_Layer: 6
-  m_Name: RockUI
+  m_Name: LogNormalUI
   m_TagString: UIItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c5e158fe5f77f554298979f95bac785d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 59a55daaf0999e04bb0898d2d560246d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -79,7 +79,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8532706613360574364
+--- !u!114 &-1826648268953939295
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,7 +94,7 @@ MonoBehaviour:
   itemEnum: 1
   gridParent: {fileID: 0}
   startPosition: {x: 0, y: 0}
---- !u!223 &6052771328624068346
+--- !u!223 &-1182407284813567075
 Canvas:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,7 +115,7 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 1
   m_TargetDisplay: 0
---- !u!114 &-4385662198027505485
+--- !u!114 &-7947914351469050076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

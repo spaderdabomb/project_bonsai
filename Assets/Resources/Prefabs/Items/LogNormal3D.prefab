@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: LogNormal
-  itemEnum: 0
+  itemEnum: 1
 --- !u!1 &2084710304935431398
 GameObject:
   m_ObjectHideFlags: 0

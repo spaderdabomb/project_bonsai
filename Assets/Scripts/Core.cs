@@ -52,7 +52,7 @@ public static class Core
         return objectsInScene;
     }
 
-    public static GameObject FindGameObjectInChildWithTag(GameObject parent, string tag)
+    public static GameObject FindChildGameObjectWithTag(GameObject parent, string tag)
     {
         Transform t = parent.transform;
         for (int i = 0; i < t.childCount; i++)
@@ -161,5 +161,25 @@ public static class Core
     public static int GetIndex(Array a, object val)
     {
         return Array.IndexOf(a, val);
+    }
+
+    public static void DestroyAllChildren(GameObject gameObject)
+    {
+        foreach (Transform child in gameObject.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
+
+    public static Color ConvertHexColorToRGBA(string hexColor)
+    {
+        Color newCol;
+        if (ColorUtility.TryParseHtmlString(hexColor, out newCol))
+        {
+            return newCol;
+        }
+
+        Debug.LogError("Failed to convert hex string to RGBA > Core.ConvertHexColorToRGBA");
+        return new Color(0, 0, 0, 255);
     }
 }
