@@ -8,7 +8,6 @@ namespace ProjectBonsai
     {
         void Start()
         {
-            print("weapon started");
 
         }
 

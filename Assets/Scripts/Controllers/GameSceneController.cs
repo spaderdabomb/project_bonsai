@@ -8,7 +8,6 @@ using UnityEngine.UI;
 using static SettingsData;
 using System.Reflection;
 using System;
-using UnityStandardAssets.Characters.FirstPerson;
 using static ItemData;
 
 namespace ProjectBonsai.Assets.Scripts.Controllers
@@ -16,7 +15,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
     public class GameSceneController : MonoBehaviour
     {
         public static GameSceneController Instance;
-        [SerializeField] Player player;
+        [SerializeField] GameObject player;
         [SerializeField] GameObject SettingsMenuController;
         [SerializeField] public GameObject mainMenu, settingsMenu;
         [SerializeField] public GameObject dimBg;
@@ -107,7 +106,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         {
             if (keybindType == SettingsData.KeyBindType.Interact)
             {
-                player.Interact();
+                player.GetComponent<Player>().Interact();
             }
             else if (Core.Contains(SettingsData.inventoryKeyBindTypes, keybindType))
             {
