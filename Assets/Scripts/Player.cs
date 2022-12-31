@@ -12,12 +12,15 @@ public class Player : MonoBehaviour
     SphereCollider sphereCollider;
     CapsuleCollider capsuleCollider;
     List<Collider> triggerList = new List<Collider>();
+    public PlayerState CurrentPlayerState { get; set; }
 
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
         sphereCollider = gameObject.GetComponent<SphereCollider>();
         capsuleCollider = gameObject.GetComponent<CapsuleCollider>();
+        CurrentPlayerState = new PlayerState();
+        CurrentPlayerState = PlayerState.Idle;
     }
 
     // Update is called once per frame
@@ -151,5 +154,12 @@ public class Player : MonoBehaviour
         return colliders;
     }
 
+
+    public enum PlayerState
+    {
+        Idle,
+        Walking,
+        Sprinting
+    }
 
 }

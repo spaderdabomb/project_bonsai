@@ -10,10 +10,13 @@ public class Item : MonoBehaviour
 
     [SerializeField] public int itemQuantity = 1;
 
+    public GameObject player;
+
     void Start()
     {
         itemStruct = ItemData.itemDict[itemEnum];
         itemName = itemStruct.name;
+        player = GameObject.FindGameObjectWithTag("Player").gameObject;
     }
 
     public void SetNumItem(int _itemQuantity)
@@ -31,9 +34,9 @@ public class Item : MonoBehaviour
 
     }
 
-    protected virtual void Attack()
+    protected virtual void Animate()
     {
-        
+
     }
 
 

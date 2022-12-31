@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
-using Unity.VisualScripting.FullSerializer;
-using Mono.Cecil.Rocks;
 
 public static class GlobalData
 {
