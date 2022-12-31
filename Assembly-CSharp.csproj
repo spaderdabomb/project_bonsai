@@ -59,31 +59,31 @@
     <Compile Include="Assets/Scripts/InteractPopup.cs" />
     <Compile Include="Assets/Scripts/ItemGrid.cs" />
     <Compile Include="Assets/Scripts/Controllers/EventController.cs" />
+    <Compile Include="Assets/Scripts/FirstPersonController.cs" />
     <Compile Include="Assets/Scripts/SettingsMenuHeader.cs" />
     <Compile Include="Assets/Scripts/Core.cs" />
     <Compile Include="Assets/Scripts/Controllers/MainMenuController.cs" />
     <Compile Include="Assets/Scripts/Item.cs" />
     <Compile Include="Assets/Scripts/Weapon.cs" />
     <Compile Include="Assets/Scripts/Controllers/GameSceneController.cs" />
+    <Compile Include="Assets/Imported/Grass And Flowers Pack 1/Example Scene/SimpleTextureDrawing.cs" />
     <Compile Include="Assets/Scripts/ItemUI.cs" />
     <Compile Include="Assets/Scripts/Controllers/CraftingMenuController.cs" />
     <Compile Include="Assets/Scripts/Controllers/LevelManager.cs" />
     <Compile Include="Assets/Scripts/Inventory.cs" />
     <Compile Include="Assets/Scripts/ItemMaterialUI.cs" />
+    <Compile Include="Assets/Imported/Polytope Studio/Lowpoly Medieval Demos/Environment_Free/PlayerMovement.cs" />
     <Compile Include="Assets/Scripts/GridSpaceUI.cs" />
     <Compile Include="Assets/Scripts/ToolHolder.cs" />
     <Compile Include="Assets/Scripts/ScriptableItem.cs" />
     <Compile Include="Assets/Scripts/SettingsKeybind.cs" />
+    <Compile Include="Assets/Imported/Polytope Studio/Lowpoly Medieval Demos/Environment_Free/MouseLook.cs" />
     <Compile Include="Assets/Scripts/Player.cs" />
     <Compile Include="Assets/Scripts/CraftingItemUI.cs" />
     <Compile Include="Assets/Scripts/GlobalData.cs" />
     <Compile Include="Assets/Scripts/Controllers/SettingsController.cs" />
     <Compile Include="Assets/Scripts/ButtonOverride.cs" />
     <Compile Include="Assets/Scripts/CraftingSubmenuUI.cs" />
-    <Compile Include="Assets/Imported/Grass And Flowers Pack 1/Example Scene/SimpleTextureDrawing.cs" />
-    <Compile Include="Assets/Imported/Polytope Studio/Lowpoly Medieval Demos/Environment_Free/MouseLook.cs" />
-    <Compile Include="Assets/Imported/Polytope Studio/Lowpoly Medieval Demos/Environment_Free/PlayerMovement.cs" />
-    <Compile Include="Assets/Scripts/FirstPersonController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
