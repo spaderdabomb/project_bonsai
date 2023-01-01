@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
         sphereCollider = gameObject.GetComponent<SphereCollider>();
         capsuleCollider = gameObject.GetComponent<CapsuleCollider>();
         CurrentPlayerState = new PlayerState();
-        CurrentPlayerState = PlayerState.Idle;
+        CurrentPlayerState = PlayerState.Idling;
     }
 
     // Update is called once per frame
@@ -157,7 +157,7 @@ public class Player : MonoBehaviour
 
     public enum PlayerState
     {
-        Idle,
+        Idling,
         Walking,
         Sprinting
     }

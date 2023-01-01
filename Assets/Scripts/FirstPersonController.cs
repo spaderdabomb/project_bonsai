@@ -17,12 +17,13 @@ using UnityEngine.UI;
 public class FirstPersonController : MonoBehaviour
 {
     private Rigidbody rb;
+    private Player player;
 
     #region Camera Movement Variables
 
     public Camera playerCamera;
 
-    public float fov = 60f;
+    public float fov = 80f;
     public bool invertCamera = false;
     public bool cameraCanMove = true;
     public float mouseSensitivity = 2f;
@@ -61,6 +62,8 @@ public class FirstPersonController : MonoBehaviour
 
     // Internal Variables
     private bool isWalking = false;
+    private bool isIdling = false;
+    private bool isJumping = false;
 
     #region Sprint
 
@@ -138,6 +141,8 @@ public class FirstPersonController : MonoBehaviour
         crosshairObject = GetComponentInChildren<Image>();
 
         // Set internal variables
+        player = gameobject.FindGameObjectWithTag("Player").GetComponent<Player>();
+
         playerCamera.fieldOfView = fov;
         originalScale = transform.localScale;
         jointOriginalPos = joint.localPosition;
@@ -378,10 +383,14 @@ public class FirstPersonController : MonoBehaviour
             if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
             {
                 isWalking = true;
+                isIdling = false;
+                player.CurrentPlayerState = Player.PlayerState.Walking;
             }
             else
             {
                 isWalking = false;
+                isIdling = true;
+                player.CurrentPlayerState = Player.PlayerState.Idling;
             }
 
             // All movement calculations shile sprint is active
@@ -401,6 +410,7 @@ public class FirstPersonController : MonoBehaviour
                 if (velocityChange.x != 0 || velocityChange.z != 0)
                 {
                     isSprinting = true;
+                    player.CurrentPlayerState = Player.PlayerState.Sprinting;
 
                     if (isCrouched)
                     {
