@@ -61,6 +61,7 @@ public class FirstPersonController : MonoBehaviour
     public float maxVelocityChange = 10f;
 
     // Internal Variables
+    private Dictionary<Player.PlayerState, bool> playerStateBools;
     private bool isWalking = false;
     private bool isIdling = false;
     private bool isJumping = false;
@@ -141,7 +142,16 @@ public class FirstPersonController : MonoBehaviour
         crosshairObject = GetComponentInChildren<Image>();
 
         // Set internal variables
-        player = gameobject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        playerStateBools = new Dictionary<Player.PlayerState, bool>
+        {
+            {  Player.PlayerState.Idling, isIdling },
+            {  Player.PlayerState.Walking, isWalking },
+            {  Player.PlayerState.Sprinting, isSprinting },
+            {  Player.PlayerState.Crouching, isCrouched },
+            {  Player.PlayerState.Jumping, isJumping },
+
+        };
 
         playerCamera.fieldOfView = fov;
         originalScale = transform.localScale;
@@ -292,7 +302,7 @@ public class FirstPersonController : MonoBehaviour
                     sprintRemaining -= 1 * Time.deltaTime;
                     if (sprintRemaining <= 0)
                     {
-                        isSprinting = false;
+                        SetPlayerStateBool(Player.PlayerState.Walking);
                         isSprintCooldown = true;
                     }
                 }
@@ -349,12 +359,12 @@ public class FirstPersonController : MonoBehaviour
             
             if(Input.GetKeyDown(crouchKey) && holdToCrouch)
             {
-                isCrouched = false;
+                SetPlayerStateBool(Player.PlayerState.Idling);
                 Crouch();
             }
             else if(Input.GetKeyUp(crouchKey) && holdToCrouch)
             {
-                isCrouched = true;
+                SetPlayerStateBool(Player.PlayerState.Crouching);
                 Crouch();
             }
         }
@@ -367,6 +377,8 @@ public class FirstPersonController : MonoBehaviour
         {
             HeadBob();
         }
+
+        SetPlayerState();
     }
 
     void FixedUpdate()
@@ -382,18 +394,14 @@ public class FirstPersonController : MonoBehaviour
             // Will allow head bob
             if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
             {
-                isWalking = true;
-                isIdling = false;
-                player.CurrentPlayerState = Player.PlayerState.Walking;
+                SetPlayerStateBool(Player.PlayerState.Walking);
             }
             else
             {
-                isWalking = false;
-                isIdling = true;
-                player.CurrentPlayerState = Player.PlayerState.Idling;
+                SetPlayerStateBool(Player.PlayerState.Idling);
             }
 
-            // All movement calculations shile sprint is active
+            // All movement calculations while sprint is active
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
@@ -409,8 +417,7 @@ public class FirstPersonController : MonoBehaviour
                 // Makes sure fov change only happens during movement
                 if (velocityChange.x != 0 || velocityChange.z != 0)
                 {
-                    isSprinting = true;
-                    player.CurrentPlayerState = Player.PlayerState.Sprinting;
+                    SetPlayerStateBool(Player.PlayerState.Sprinting);
 
                     if (isCrouched)
                     {
@@ -428,7 +435,7 @@ public class FirstPersonController : MonoBehaviour
             // All movement calculations while walking
             else
             {
-                isSprinting = false;
+                SetPlayerStateBool(Player.PlayerState.Walking);
 
                 if (hideBarWhenFull && sprintRemaining == sprintDuration)
                 {
@@ -494,7 +501,7 @@ public class FirstPersonController : MonoBehaviour
             transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
             walkSpeed /= speedReduction;
 
-            isCrouched = false;
+            SetPlayerStateBool(Player.PlayerState.Idling);
         }
         // Crouches player down to set height
         // Reduces walkSpeed
@@ -503,7 +510,7 @@ public class FirstPersonController : MonoBehaviour
             transform.localScale = new Vector3(originalScale.x, crouchHeight, originalScale.z);
             walkSpeed *= speedReduction;
 
-            isCrouched = true;
+            SetPlayerStateBool(Player.PlayerState.Crouching);
         }
     }
 
@@ -536,8 +543,33 @@ public class FirstPersonController : MonoBehaviour
             joint.localPosition = new Vector3(Mathf.Lerp(joint.localPosition.x, jointOriginalPos.x, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.y, jointOriginalPos.y, Time.deltaTime * bobSpeed), Mathf.Lerp(joint.localPosition.z, jointOriginalPos.z, Time.deltaTime * bobSpeed));
         }
     }
-}
 
+    private void SetPlayerStateBool(Player.PlayerState newState)
+    {
+        foreach (KeyValuePair<Player.PlayerState, bool> keyValuePair in playerStateBools)
+        {
+            if (keyValuePair.Key == newState)
+            {
+                playerStateBools[newState] = true;
+            }
+            else
+            {
+                playerStateBools[keyValuePair.Key] = false;
+            }
+        }
+    }
+
+    private void SetPlayerState()
+    {
+        foreach (KeyValuePair<Player.PlayerState, bool> keyValuePair in playerStateBools)
+        {
+            if (keyValuePair.Value)
+            {
+                player.CurrentPlayerState = keyValuePair.Key;
+            }
+        }
+    }
+}
 
 
 // Custom Editor

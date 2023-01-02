@@ -19,7 +19,7 @@ namespace ProjectBonsai
 
         protected override void Animate()
         {
-            if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Idle)
+            if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Idling)
             {
 
             }

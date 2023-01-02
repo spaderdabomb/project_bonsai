@@ -7,12 +7,12 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject interactPopup;
+    [SerializeField] public PlayerState CurrentPlayerState { get; set; }
 
     Rigidbody rb;
     SphereCollider sphereCollider;
     CapsuleCollider capsuleCollider;
     List<Collider> triggerList = new List<Collider>();
-    public PlayerState CurrentPlayerState { get; set; }
 
     void Start()
     {
@@ -159,7 +159,10 @@ public class Player : MonoBehaviour
     {
         Idling,
         Walking,
-        Sprinting
+        Sprinting,
+        Crouching,
+        CrouchWalking,
+        Jumping
     }
 
 }
