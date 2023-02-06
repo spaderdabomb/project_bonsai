@@ -4,6 +4,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+using ProjectBonsai.Assets.Scripts.Controllers;
+
+
 namespace ProjectBonsai
 {
     public class SettingsKeybind : MonoBehaviour

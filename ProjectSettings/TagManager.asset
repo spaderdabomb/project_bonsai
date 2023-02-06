@@ -11,6 +11,15 @@ TagManager:
   - UIItem
   - ItemGrid
   - GridSpace
+  - ItemEquipped
+  - Terrain
+  - Tree
+  - TerrainObjectHolder
+  - ItemSpawns
+  - Ore
+  - FxTemporaire
+  - Water
+  - AI
   layers:
   - Default
   - TransparentFX
@@ -19,13 +28,13 @@ TagManager:
   - Water
   - UI
   - UIItem
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Item
+  - Player
+  - SubItem
+  - Post Processing
+  - Water Transition
+  - AI
+  - AICollider
   - 
   - 
   - 

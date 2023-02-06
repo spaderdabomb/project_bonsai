@@ -117,7 +117,6 @@ MonoBehaviour:
   m_Toggle: {fileID: 484391352587237723}
   grid: {fileID: 8023460277041960859}
   quantityText: {fileID: 2434957039547996610}
-  itemQuantity: 0
   gridIndex: 0
   quantityTextOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &74373104597634416

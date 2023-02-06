@@ -1,9 +1,12 @@
-using ProjectBonsai.Assets.Scripts.Controllers;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
+using ProjectBonsai.Assets.Scripts.Controllers;
+using ProjectBonsai.Assets.Scripts.UI;
 
 namespace ProjectBonsai
 {
@@ -15,11 +18,19 @@ namespace ProjectBonsai
         public GameObject[] gridSpaces;
         public GameObject[] keybindTexts;
 
+        private ToggleGroup toggleGroup;
+
         public void InitItemGrid(int rows, int columns)
         {
             _rows = rows;
             _columns = columns;
         }
+
+        private void Awake()
+        {
+            toggleGroup = gameObject.GetComponent<ToggleGroup>();
+        }
+
         void Start()
         {
             // Deal with already being instantiated vs. loading prefab
@@ -248,6 +259,44 @@ namespace ProjectBonsai
                 keybindTexts[i].GetComponent<TextMeshProUGUI>().text = keyCodeStr;
                 i++;
             }
+        }
+
+        public int GetSelectedToggleIndex()
+        {
+            Toggle currentToggle = toggleGroup.ActiveToggles().FirstOrDefault();
+            for (int i = 0; i < gridSpaces.Length; i++)
+            {
+                Toggle gridSpaceToggle = gridSpaces[i].GetComponent<Toggle>();
+                if (currentToggle == gridSpaceToggle) 
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public ItemData.ItemEnum GetCurrentSelectedItem()
+        {
+            Toggle currentToggle = toggleGroup.ActiveToggles().FirstOrDefault();
+            for (int i = 0; i < gridSpaces.Length; i++)
+            {
+                Toggle gridSpaceToggle = gridSpaces[i].GetComponent<Toggle>();
+                if (currentToggle == gridSpaceToggle)
+                {
+                    GameObject itemUI = gridSpaces[i].GetComponent<GridSpaceUI>().GetCurrentItemUI();
+                    if (itemUI == null)
+                    {
+                        return ItemData.ItemEnum.Null;
+                    }
+                    else
+                    {
+                        return itemUI.GetComponent<ItemUI>().itemEnum;
+                    }
+                }
+            }
+
+            return ItemData.ItemEnum.Null;
         }
     }
 }

@@ -1,32 +1,55 @@
 using ProjectBonsai;
 using ProjectBonsai.Assets.Scripts.Controllers;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using ProjectBonsai.Assets.Scripts.UI;
+
 
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject interactPopup;
-    [SerializeField] public PlayerState CurrentPlayerState { get; set; }
+    [SerializeField] public GameObject playerCamera;
+    [SerializeField] public CapsuleCollider weaponCollider;
+    [SerializeField] public SphereCollider waterCollider;
 
-    Rigidbody rb;
-    SphereCollider sphereCollider;
-    CapsuleCollider capsuleCollider;
-    List<Collider> triggerList = new List<Collider>();
+    [SerializeField] public PlayerState CurrentPlayerState;
+    [SerializeField] public PlayerCombatState CurrentPlayerCombatState;
+    [SerializeField] public PlayerEnvironmentState CurrentPlayerEnvironmentState;
+
+    [HideInInspector] public FirstPersonController fpController;
+    [HideInInspector] public Rigidbody rb;
+
+    private SphereCollider sphereCollider;
+    private CapsuleCollider capsuleCollider;
+    private List<Collider> triggerList = new List<Collider>();
+    private List<Collider> colliderList = new List<Collider>();
+
+    public PlayerData playerData;
+
+    private void Awake()
+    {
+
+    }
 
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        fpController = gameObject.GetComponent<FirstPersonController>();
         sphereCollider = gameObject.GetComponent<SphereCollider>();
         capsuleCollider = gameObject.GetComponent<CapsuleCollider>();
         CurrentPlayerState = new PlayerState();
         CurrentPlayerState = PlayerState.Idling;
+        CurrentPlayerCombatState = new PlayerCombatState();
+        CurrentPlayerCombatState = PlayerCombatState.Idling;
+        CurrentPlayerEnvironmentState = new PlayerEnvironmentState();
+        CurrentPlayerEnvironmentState = PlayerEnvironmentState.OnLand;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void OnEnable()
@@ -41,44 +64,81 @@ public class Player : MonoBehaviour
         
     public void Interact()
     {
-        List<Collider> colliderList = getColliders();
+        List<Collider> tempTriggerList = getTriggers();
         bool foundSubItem = false;
-        foreach (Collider collider in colliderList)
+        foreach (Collider trigger in tempTriggerList)
         {
-            if (collider != null)
+            if (trigger != null)
             {
-                if (collider.gameObject.tag == "SubItem" && !foundSubItem)
+                if (trigger.gameObject.CompareTag("SubItem") && !foundSubItem)
                 {
                     // Get reference values
-                    GameObject colliderParent = Core.GetFirstParentWithTag(collider.gameObject, "Item");
-                    Item colliderItem = colliderParent.GetComponent<Item>();
-                    ItemData.ItemStruct itemStruct = colliderItem.itemStruct;
-                    ItemData.ItemEnum itemEnum = colliderItem.itemEnum;
-                    int itemQuantity = colliderItem.itemQuantity;
+                    GameObject triggerParent = Core.GetFirstParentWithTag(trigger.gameObject, "Item");
+                    Item triggerItem = triggerParent.GetComponent<Item>();
+                    ItemData.ItemStruct itemStruct = triggerItem.itemStruct;
+                    ItemData.ItemEnum itemEnum = triggerItem.itemEnum;
+                    int itemQuantity = triggerItem.itemQuantity;
 
                     // Remove item model and add item UI
                     int leftOverItemQuantity = GameSceneController.Instance.AddUIItem(itemEnum, itemQuantity);
                     if (leftOverItemQuantity == 0)
                     {
-                        Destroy(colliderParent);
-                        triggerList.Remove(collider);
+                        Destroy(triggerParent);
+                        triggerList.Remove(trigger);
                         interactPopup.GetComponent<InteractPopup>().HidePopup();
                     }
                     // When model remains, create new quantity
                     else
                     {
-                        colliderParent.GetComponent<Item>().itemQuantity = leftOverItemQuantity;
-                        interactPopup.GetComponent<InteractPopup>().ShowPopup(colliderParent);
+                        triggerParent.GetComponent<Item>().itemQuantity = leftOverItemQuantity;
+                        interactPopup.GetComponent<InteractPopup>().ShowPopup(triggerParent);
                     }
                     foundSubItem = true;
                 }
                 else
                 {
-                    triggerList.Remove(collider);
+                    triggerList.Remove(trigger);
                 }
             }
         }
+    }
 
+    public void StartAttack()
+    {
+        CurrentPlayerCombatState = PlayerCombatState.Attacking;
+    }
+
+    public void OnAttackHitFrame()
+    {
+        List<Collider> tempColliderList = weaponCollider.GetComponent<CollidersInTrigger>().GetList();
+
+        foreach (Collider collider in tempColliderList)
+        {
+            if (collider == null)
+            {
+                weaponCollider.GetComponent<CollidersInTrigger>().RemoveItem(collider);
+                continue;
+            }
+
+            if (!collider.TryGetComponent<IDamagable>(out var iDamagable))
+            {
+                print("does not have interface");
+                continue;
+            }
+
+            ItemData.ItemEnum currentItemEnum = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetCurrentSelectedItem();
+            if (!iDamagable.CanDamage(currentItemEnum))
+            {
+                continue;
+            }
+
+            // TODO: include player base damage
+            float healthRemaining = iDamagable.Damage(ItemData.weaponDict[currentItemEnum].attackBonus * 4f);
+            if (healthRemaining <= 0f)
+            {
+                weaponCollider.GetComponent<CollidersInTrigger>().RemoveItem(collider);
+            }
+        }
     }
 
     // Searches toolholder than inventory for available slot to add item
@@ -86,11 +146,11 @@ public class Player : MonoBehaviour
     {
         int indexToAdd;
         GameObject itemGrid;
-        bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+        bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
         bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
         if (itemExistsInToolholder)
         {
-            indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+            indexToAdd = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
             itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
         }
         else if (itemExistsInInventory)
@@ -100,8 +160,8 @@ public class Player : MonoBehaviour
         }
         else
         {
-            indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
-            itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+            indexToAdd = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+            itemGrid = GameSceneController.Instance.toolHolder.itemGrid;
             if (indexToAdd == -1)
             {
                 indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
@@ -112,44 +172,73 @@ public class Player : MonoBehaviour
         return (itemGrid, indexToAdd);
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider trigger)
     {
-        if (!triggerList.Contains(other))
+        if (!triggerList.Contains(trigger))
         {
-            if (other.gameObject.tag == "SubItem")
+            // NOTE: Must put on subitem trigger collider if you want to interact with item (Item layer doesn't interact with player)
+            if (trigger.gameObject.CompareTag("SubItem"))
             {
-                GameObject colliderParent = other.transform.parent.gameObject;
-                if (colliderParent.tag == "Item")
+                GameObject triggerParent = trigger.transform.parent.gameObject;
+                if (triggerParent.CompareTag("Item"))
                 {
-                    interactPopup.GetComponent<InteractPopup>().ShowPopup(colliderParent);
+                    interactPopup.GetComponent<InteractPopup>().ShowPopup(triggerParent);
                 }
             }
-            triggerList.Add(other);
+            triggerList.Add(trigger);
         }
     }
 
-    void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider trigger)
     {
-        if (triggerList.Contains(other))
+        if (triggerList.Contains(trigger))
         {
-            if (other.gameObject.tag == "SubItem")
+            if (trigger.gameObject.CompareTag("SubItem"))
             {
-                GameObject colliderParent = other.transform.parent.gameObject;
-                if (colliderParent.tag == "Item")
+                GameObject triggerParent = trigger.transform.parent.gameObject;
+                if (triggerParent.CompareTag("Item"))
                 {
                     interactPopup.GetComponent<InteractPopup>().HidePopup();
                 }
             }
-            triggerList.Remove(other);
+            triggerList.Remove(trigger);
         }
     }
+
+    List<Collider> getTriggers()
+    {
+        List<Collider> triggers = new List<Collider>();
+        foreach (Collider trigger in triggerList)
+        {
+            triggers.Add(trigger);
+        }
+        return triggers;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!colliderList.Contains(collision.collider))
+        {
+            colliderList.Add(collision.collider);
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (colliderList.Contains(collision.collider))
+        {
+            colliderList.Remove(collision.collider);
+        }
+
+    }
+
 
     List<Collider> getColliders()
     {
         List<Collider> colliders = new List<Collider>();
-        foreach (Collider col in triggerList)
+        foreach (Collider collider in colliderList)
         {
-            colliders.Add(col);
+            colliders.Add(collider);
         }
         return colliders;
     }
@@ -165,4 +254,18 @@ public class Player : MonoBehaviour
         Jumping
     }
 
+    public enum PlayerCombatState
+    {
+        Idling,
+        Attacking,
+        Blocking,
+        Healing
+    }
+
+    public enum PlayerEnvironmentState
+    {
+        OnLand,
+        InWater,
+        OnIce
+    }
 }

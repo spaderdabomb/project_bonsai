@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="ObjectiveElement" style="height: 33px; width: 310px; position: relative; -unity-background-image-tint-color: rgb(0, 0, 0); left: auto; background-color: rgba(0, 0, 0, 0.39); flex-direction: row; min-height: 30px; align-items: center; padding-left: 5px; margin-right: 0; margin-top: 20px; margin-left: 20px;">
+        <ui:VisualElement name="ObjSymbol" style="background-image: resource(&apos;Photoshop/UIIcons/checkbox&apos;); width: 18px; height: 18px; padding-left: 0;" />
+        <ui:Label text="2/2 - Reach lv. 2 woodcutting" display-tooltip-when-elided="true" name="ObjTitle" class="label MyLabel" style="font-size: 14px; margin-top: 0; margin-bottom: 0;" />
+    </ui:VisualElement>
+</ui:UXML>

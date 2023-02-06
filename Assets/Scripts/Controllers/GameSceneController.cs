@@ -5,24 +5,25 @@ using ProjectBonsai;
 using System.Linq;
 using UnityEngine.UI;
 
-using static SettingsData;
-using System.Reflection;
-using System;
-using static ItemData;
+using ProjectBonsai.Assets.Scripts.UI;
+
 
 namespace ProjectBonsai.Assets.Scripts.Controllers
 {
     public class GameSceneController : MonoBehaviour
     {
         public static GameSceneController Instance;
-        [SerializeField] GameObject player;
+        [SerializeField] public GameObject player;
         [SerializeField] GameObject SettingsMenuController;
         [SerializeField] public GameObject mainMenu, settingsMenu;
         [SerializeField] public GameObject dimBg;
-        [SerializeField] public GameObject toolHolder, inventory, craftingMenu, playerMenu;
+        [SerializeField] public GameObject toolHolder_go, inventory, craftingMenu, playerMenu;
         [SerializeField] public Camera mainCamera;
 
-        int currentSpawnIndex = 0;
+        public Dictionary<SkillData.SkillType, PlayerSkill> skillDict;
+
+        [HideInInspector] public ToolHolder toolHolder;
+        [HideInInspector] public GameState currentGameState;
 
         private void Awake()
         {
@@ -36,11 +37,23 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         }
         void Start()
         {
+            skillDict = new Dictionary<SkillData.SkillType, PlayerSkill>()
+            {
+                { SkillData.SkillType.Woodcutting, ScriptableObject.CreateInstance<WoodcuttingSkill>() },
+                { SkillData.SkillType.Mining, ScriptableObject.CreateInstance<MiningSkill>() },
+                { SkillData.SkillType.Fishing, ScriptableObject.CreateInstance<FishingSkill>() },
+            };
+
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
 
             SettingsMenuController.SetActive(true);
             SettingsMenuController.SetActive(false);
+
+            toolHolder = toolHolder_go.GetComponent<ToolHolder>();
+            currentGameState = GameState.Playing;
+
+            ObjectiveData.objectiveDataList[0].OnTaskStart();
         }
 
         void Update()
@@ -74,6 +87,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
                 player.GetComponent<FirstPersonController>().enabled = false;
+                currentGameState = GameState.Settings;
             }
             else if (settingsMenu.activeSelf)
             {
@@ -83,6 +97,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
                 player.GetComponent<FirstPersonController>().enabled = false;
+                currentGameState = GameState.Settings;
             }
             else
             {
@@ -108,31 +123,52 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             {
                 player.GetComponent<Player>().Interact();
             }
+            else if (keybindType == SettingsData.KeyBindType.Attack)
+            {
+                if (currentGameState == GameState.Playing) 
+                {
+                    player.GetComponent<Player>().StartAttack();
+                }
+            }
             else if (Core.Contains(SettingsData.inventoryKeyBindTypes, keybindType))
             {
                 int toolHolderIndex = Core.GetIndex(SettingsData.inventoryKeyBindTypes, keybindType);
-                toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().gridSpaces[toolHolderIndex].GetComponent<Toggle>().isOn = true;
+                toolHolder.itemGrid.GetComponent<ItemGrid>().gridSpaces[toolHolderIndex].GetComponent<Toggle>().isOn = true;
+                // Other code fires in GridSpaceUI ToggleValueChanged()
             }
             else if (keybindType == SettingsData.KeyBindType.ShowInventory)
             {
-                bool activeState = !inventory.GetComponent<Canvas>().enabled;
+/*                bool activeState = !inventory.GetComponent<Canvas>().enabled;
                 inventory.GetComponent<Canvas>().enabled = activeState;
                 craftingMenu.GetComponent<Canvas>().enabled = activeState;
-                playerMenu.GetComponent<Canvas>().enabled = activeState;
+                playerMenu.GetComponent<Canvas>().enabled = activeState;*/
 
-                if (inventory.GetComponent<Canvas>().enabled)
+                bool activeState = !inventory.GetComponent<CanvasGroup>().interactable;
+                Core.SetCanvasGroupState(inventory.GetComponent<CanvasGroup>(), activeState);
+                Core.SetCanvasGroupState(craftingMenu.GetComponent<CanvasGroup>(), activeState);
+                Core.SetCanvasGroupState(playerMenu.GetComponent<CanvasGroup>(), activeState);
+
+                if (inventory.GetComponent<CanvasGroup>().interactable)
                 {
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
                     player.GetComponent<FirstPersonController>().enabled = false;
                     CraftingMenuController.Instance.ShowCraftingSubMenu(CraftingMenuController.Instance.GetCurrentSelectedItemToggle());
+                    currentGameState = GameState.Crafting;
                 }
                 else
                 {
-                    Cursor.visible = false;
-                    Cursor.lockState = CursorLockMode.Locked;
-                    player.GetComponent<FirstPersonController>().enabled = true;
+                    ResumePlayState();
                 }
+            }
+        }
+
+        public void InstantiateEquippedItem(ItemData.ItemEnum itemEnum)
+        {
+            if (ItemData.weaponDict.ContainsKey(itemEnum))
+            {
+                GameObject itemPrefab = Resources.Load<GameObject>(GlobalData.equippedItemsPrefabPath + ItemData.weaponDict[itemEnum].equippedName);
+                Instantiate(itemPrefab, player.GetComponent<Player>().playerCamera.transform);
             }
         }
 
@@ -144,6 +180,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             player.GetComponent<FirstPersonController>().enabled = true;
+            currentGameState = GameState.Playing;
         }
 
         /// <summary>
@@ -229,12 +266,12 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         {
             int indexToAdd;
             GameObject itemGrid;
-            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
             bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
             if (itemExistsInToolholder)
             {
-                indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
-                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                indexToAdd = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.itemGrid;
             }
             else if (itemExistsInInventory)
             {
@@ -243,8 +280,8 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             }
             else
             {
-                indexToAdd = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
-                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                indexToAdd = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
+                itemGrid = GameSceneController.Instance.toolHolder.itemGrid;
                 if (indexToAdd == -1)
                 {
                     indexToAdd = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstFreeSlotIndex();
@@ -265,13 +302,13 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         {
             int indexToSubtract;
             GameObject itemGrid;
-            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
+            bool itemExistsInToolholder = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
             bool itemExistsInInventory = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().DoesNonMaxItemStackExist(itemEnum);
 
             if (itemExistsInToolholder)
             {
-                indexToSubtract = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
-                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                indexToSubtract = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstNonMaxStackSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.itemGrid;
             }
             else if (itemExistsInInventory)
             {
@@ -280,8 +317,8 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             }
             else
             {
-                indexToSubtract = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetFirstSlotWithItem(itemEnum);
-                itemGrid = GameSceneController.Instance.toolHolder.GetComponent<ToolHolder>().itemGrid;
+                indexToSubtract = GameSceneController.Instance.toolHolder.itemGrid.GetComponent<ItemGrid>().GetFirstSlotWithItem(itemEnum);
+                itemGrid = GameSceneController.Instance.toolHolder.itemGrid;
                 if (indexToSubtract == -1)
                 {
                     indexToSubtract = GameSceneController.Instance.inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetFirstSlotWithItem(itemEnum);
@@ -302,6 +339,13 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         private void OnDisable()
         {
             EventController.OnKeyPress -= GameSceneKeyPressed;
+        }
+
+        public enum GameState
+        {
+            Playing,
+            Settings,
+            Crafting
         }
     }
 }

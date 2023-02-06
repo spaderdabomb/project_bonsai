@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static ItemData;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-namespace ProjectBonsai
+using ProjectBonsai;
+using ProjectBonsai.Assets.Scripts.UI;
+
+namespace ProjectBonsai.Assets.Scripts.Controllers
 {
     public class CraftingMenuController : MonoBehaviour
     {
@@ -17,10 +19,11 @@ namespace ProjectBonsai
         [SerializeField] GameObject craftingSubMenu;
         [SerializeField] GameObject craftingButton;
 
-        [SerializeField] public GameObject toolHolder, inventory;
+        [SerializeField] public GameObject toolHolder_go, inventory;
 
         [HideInInspector] public GameObject[] menuToggleGOs;
         [HideInInspector] public int numCraftingMenus;
+        [HideInInspector] public ToolHolder toolHolder;
 
         private GameObject itemPrefab_1;
 
@@ -37,6 +40,7 @@ namespace ProjectBonsai
 
         void Start()
         {
+            toolHolder = toolHolder_go.GetComponent<ToolHolder>();
             itemPrefab_1 = (GameObject)Resources.Load("Prefabs/UI/CraftingItemUI");
             numCraftingMenus = craftingMenuGrid.transform.childCount;
             menuToggleGOs = new GameObject[numCraftingMenus];
@@ -112,7 +116,7 @@ namespace ProjectBonsai
 
                     // Check if item is craftable
                     ItemMaterialUI craftingItemUI = itemMaterialUI.GetComponent<ItemMaterialUI>().GetComponentInChildren<ItemMaterialUI>();
-                    int toolHolderItemQuantity = toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().GetTotalItemQuantity(craftingRecipe.items[i]);
+                    int toolHolderItemQuantity = toolHolder.itemGrid.GetComponent<ItemGrid>().GetTotalItemQuantity(craftingRecipe.items[i]);
                     int inventoryItemQuantity = inventory.GetComponent<Inventory>().itemGrid.GetComponent<ItemGrid>().GetTotalItemQuantity(craftingRecipe.items[i]);
                     int totalItemQuantity = toolHolderItemQuantity + inventoryItemQuantity;
                     if (craftingRecipe.numItems[i] > totalItemQuantity)

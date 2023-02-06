@@ -2,7 +2,7 @@
   "dependencies": {
     "com.unity.2d.animation": {
       "version": "7.0.9",
-      "depth": 0,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.2d.common": "6.0.6",
@@ -156,6 +156,15 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.postprocessing": {
+      "version": "3.2.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
@@ -317,6 +326,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "me.ameye.prefab-painter": {
+      "version": "https://github.com/alexanderameye/prefab-painter.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f78b6b205ab54296ca4fd27c509a665367f84347"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

@@ -8,9 +8,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using ProjectBonsai;
+using static Player;
+using Unity.VisualScripting;
 
 #if UNITY_EDITOR
-    using UnityEditor;
+using UnityEditor;
     using System.Net;
 #endif
 
@@ -63,8 +66,15 @@ public class FirstPersonController : MonoBehaviour
     // Internal Variables
     private Dictionary<Player.PlayerState, bool> playerStateBools;
     private bool isWalking = false;
-    private bool isIdling = false;
-    private bool isJumping = false;
+
+    #region Swimming
+
+    public float swimSpeedMultiplier = 0.5f;
+    public float swimEyeLevel = 0.1f;
+    private float waterPlaneLevel = 0;
+    private bool canExitWater = true;
+
+    #endregion
 
     #region Sprint
 
@@ -145,11 +155,12 @@ public class FirstPersonController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         playerStateBools = new Dictionary<Player.PlayerState, bool>
         {
-            {  Player.PlayerState.Idling, isIdling },
-            {  Player.PlayerState.Walking, isWalking },
-            {  Player.PlayerState.Sprinting, isSprinting },
-            {  Player.PlayerState.Crouching, isCrouched },
-            {  Player.PlayerState.Jumping, isJumping },
+            {  Player.PlayerState.Idling, true },
+            {  Player.PlayerState.Walking, false },
+            {  Player.PlayerState.Sprinting, false },
+            {  Player.PlayerState.Crouching, false },
+            {  Player.PlayerState.CrouchWalking, false },
+            {  Player.PlayerState.Jumping, false },
 
         };
 
@@ -196,6 +207,9 @@ public class FirstPersonController : MonoBehaviour
             sprintBarWidth = screenWidth * sprintBarWidthPercent;
             sprintBarHeight = screenHeight * sprintBarHeightPercent;
 
+            sprintBarWidth = sprintBarBG.GetComponent<RectTransform>().sizeDelta.x;
+            sprintBarHeight = sprintBarBG.GetComponent<RectTransform>().sizeDelta.y;
+
             sprintBarBG.rectTransform.sizeDelta = new Vector3(sprintBarWidth, sprintBarHeight, 0f);
             sprintBar.rectTransform.sizeDelta = new Vector3(sprintBarWidth - 2, sprintBarHeight - 2, 0f);
 
@@ -217,10 +231,21 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
+        #region Swimming
+        if (player.CurrentPlayerEnvironmentState == Player.PlayerEnvironmentState.InWater)
+        {
+            player.rb.useGravity = false;
+        }
+        else
+        {
+            player.rb.useGravity = true;
+        }
+        #endregion
+
         #region Camera
 
         // Control camera movement
-        if(cameraCanMove)
+        if (cameraCanMove)
         {
             yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
 
@@ -289,7 +314,7 @@ public class FirstPersonController : MonoBehaviour
 
         #region Sprint
 
-        if(enableSprint)
+        if (enableSprint)
         {
             if(isSprinting)
             {
@@ -303,6 +328,7 @@ public class FirstPersonController : MonoBehaviour
                     if (sprintRemaining <= 0)
                     {
                         SetPlayerStateBool(Player.PlayerState.Walking);
+                        isSprinting = false;
                         isSprintCooldown = true;
                     }
                 }
@@ -359,12 +385,12 @@ public class FirstPersonController : MonoBehaviour
             
             if(Input.GetKeyDown(crouchKey) && holdToCrouch)
             {
-                SetPlayerStateBool(Player.PlayerState.Idling);
+                isCrouched = false;
                 Crouch();
             }
             else if(Input.GetKeyUp(crouchKey) && holdToCrouch)
             {
-                SetPlayerStateBool(Player.PlayerState.Crouching);
+                isCrouched = true;
                 Crouch();
             }
         }
@@ -377,8 +403,6 @@ public class FirstPersonController : MonoBehaviour
         {
             HeadBob();
         }
-
-        SetPlayerState();
     }
 
     void FixedUpdate()
@@ -392,32 +416,42 @@ public class FirstPersonController : MonoBehaviour
 
             // Checks if player is walking and isGrounded
             // Will allow head bob
-            if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
-            {
-                SetPlayerStateBool(Player.PlayerState.Walking);
-            }
-            else
-            {
-                SetPlayerStateBool(Player.PlayerState.Idling);
-            }
 
             // All movement calculations while sprint is active
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
             {
-                targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
+                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                {
+                    targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
+                }
+                else
+                {
+                    targetVelocity = player.playerCamera.transform.TransformDirection(targetVelocity) * sprintSpeed * swimSpeedMultiplier;
+                    if (!canExitWater && targetVelocity.y > 0 && player.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
+                    {
+                        targetVelocity = new Vector3(targetVelocity.x, 0, targetVelocity.z);
+                    }
+                }
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
+                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                {
+                    velocityChange.y = 0;
+                }
+                else
+                {
+                    velocityChange.y = Mathf.Clamp(velocityChange.y, -maxVelocityChange, maxVelocityChange);
+                }
 
                 // Player is only moving when valocity change != 0
                 // Makes sure fov change only happens during movement
-                if (velocityChange.x != 0 || velocityChange.z != 0)
+                if (targetVelocity.x != 0f || targetVelocity.z != 0f)
                 {
-                    SetPlayerStateBool(Player.PlayerState.Sprinting);
+                    isSprinting = true;
 
                     if (isCrouched)
                     {
@@ -435,26 +469,48 @@ public class FirstPersonController : MonoBehaviour
             // All movement calculations while walking
             else
             {
-                SetPlayerStateBool(Player.PlayerState.Walking);
+                isSprinting = false;
 
                 if (hideBarWhenFull && sprintRemaining == sprintDuration)
                 {
                     sprintBarCG.alpha -= 3 * Time.deltaTime;
                 }
 
-                targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
+                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                {
+                    targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
+                }
+                else
+                {
+                    // Swimming
+                    targetVelocity = player.playerCamera.transform.TransformDirection(targetVelocity) * walkSpeed * swimSpeedMultiplier;
+                    if (!canExitWater && targetVelocity.y > 0 && player.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
+                    {
+                        targetVelocity = new Vector3(targetVelocity.x, 0, targetVelocity.z);
+                    }
+                }
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.velocity;
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                velocityChange.y = 0;
+                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                {
+                    velocityChange.y = 0;
+                }
+                else
+                {
+                    velocityChange.y = Mathf.Clamp(velocityChange.y, -maxVelocityChange, maxVelocityChange);
+                }
 
                 rb.AddForce(velocityChange, ForceMode.VelocityChange);
             }
+            Player.PlayerState newPlayerState = CheckMovementState(targetVelocity);
+            SetPlayerStateBool(newPlayerState);
         }
 
+        SetPlayerState();
         #endregion
     }
 
@@ -483,6 +539,7 @@ public class FirstPersonController : MonoBehaviour
         {
             rb.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
             isGrounded = false;
+            SetPlayerStateBool(Player.PlayerState.Jumping);
         }
 
         // When crouched and using toggle system, will uncrouch for a jump
@@ -500,8 +557,8 @@ public class FirstPersonController : MonoBehaviour
         {
             transform.localScale = new Vector3(originalScale.x, originalScale.y, originalScale.z);
             walkSpeed /= speedReduction;
-
             SetPlayerStateBool(Player.PlayerState.Idling);
+            isCrouched = false;
         }
         // Crouches player down to set height
         // Reduces walkSpeed
@@ -509,8 +566,8 @@ public class FirstPersonController : MonoBehaviour
         {
             transform.localScale = new Vector3(originalScale.x, crouchHeight, originalScale.z);
             walkSpeed *= speedReduction;
-
             SetPlayerStateBool(Player.PlayerState.Crouching);
+            isCrouched = true;
         }
     }
 
@@ -544,10 +601,49 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    private Player.PlayerState CheckMovementState(Vector3 targetVelocity)
+    {
+        if (!isGrounded)
+        {
+            return Player.PlayerState.Jumping;
+        }
+        else if (isSprinting)
+        {
+            isWalking = false;
+            return Player.PlayerState.Sprinting;
+        }
+        else if ((targetVelocity.x != 0 || targetVelocity.y != 0f || targetVelocity.z != 0) && isGrounded && isCrouched)
+        {
+            isWalking = true;
+            return Player.PlayerState.CrouchWalking;
+        }
+        else if ((targetVelocity.x != 0 || targetVelocity.y != 0f || targetVelocity.z != 0) && isGrounded)
+        {
+            isWalking = true;
+            return Player.PlayerState.Walking;
+        }
+        else if (isCrouched)
+        {
+            isWalking = false;
+            return Player.PlayerState.Crouching;
+        }
+        else
+        {
+            isWalking = false;
+            return Player.PlayerState.Idling;
+        }
+    }
+
     private void SetPlayerStateBool(Player.PlayerState newState)
     {
+        Dictionary<Player.PlayerState, bool> tempDict = new Dictionary<Player.PlayerState, bool>();
         foreach (KeyValuePair<Player.PlayerState, bool> keyValuePair in playerStateBools)
         {
+            tempDict.Add(keyValuePair.Key, keyValuePair.Value);
+        }
+
+        foreach (KeyValuePair<Player.PlayerState, bool> keyValuePair in tempDict)
+        { 
             if (keyValuePair.Key == newState)
             {
                 playerStateBools[newState] = true;
@@ -567,6 +663,41 @@ public class FirstPersonController : MonoBehaviour
             {
                 player.CurrentPlayerState = keyValuePair.Key;
             }
+        }
+    }
+
+    private void SetWaterPlaneLevel()
+    {
+        List<Collider> waterTriggers = player.waterCollider.GetComponent<TriggersInTrigger>().GetList();
+        foreach (Collider trigger in waterTriggers)
+        {
+            if (trigger.gameObject.CompareTag("Water"))
+            {
+                GameObject waterVolume = trigger.gameObject;
+                waterPlaneLevel = waterVolume.transform.parent.transform.position.y;
+                canExitWater = false;
+                return;
+            }
+        }
+    }
+
+    public void WaterEntered()
+    {
+        player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
+        SetWaterPlaneLevel();
+    }
+
+    public void WaterExited()
+    {
+        if (isGrounded)
+        {
+            player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.OnLand;
+            canExitWater = true;
+        }
+        else
+        {
+            player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
+            SetWaterPlaneLevel();
         }
     }
 }
@@ -663,6 +794,15 @@ public class FirstPersonController : MonoBehaviour
         GUI.enabled = true;
 
         EditorGUILayout.Space();
+
+        #region Swimming
+
+        GUILayout.Label("Swimming", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold, fontSize = 13 }, GUILayout.ExpandWidth(true));
+
+        fpc.swimSpeedMultiplier = EditorGUILayout.Slider(new GUIContent("Swim Speed Multiplier", "Determines swim speed"), fpc.swimSpeedMultiplier, 0.1f, 1.0f);
+        fpc.swimEyeLevel = EditorGUILayout.Slider(new GUIContent("Swim Eye Level", "Determines swim eye level"), fpc.swimEyeLevel, -1f, 1f);
+
+        #endregion
 
         #region Sprint
 

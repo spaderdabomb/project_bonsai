@@ -9,7 +9,7 @@ using UnityEngine;
 using static SettingsData;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
-namespace ProjectBonsai
+namespace ProjectBonsai.Assets.Scripts.Controllers
 {
     public class SettingsController : MonoBehaviour
     {
@@ -17,7 +17,10 @@ namespace ProjectBonsai
 
         [SerializeField] GameObject keybindMenuMovement, keybindMenuEquipment;
         [SerializeField] GameObject PressAnyKeyPanel;
-        [SerializeField] GameObject toolHolder;
+        [SerializeField] GameObject toolHolder_go;
+
+        [HideInInspector] ToolHolder toolHolder;
+
         private GameObject currentKeycodeField;
         private GameObject[] keybindMenus;
         private int currentKeycodeColumn;
@@ -42,7 +45,7 @@ namespace ProjectBonsai
 
         void Start()
         {
-
+            toolHolder = toolHolder_go.GetComponent<ToolHolder>();
         }
 
         private void InitSettingsData()
@@ -55,6 +58,7 @@ namespace ProjectBonsai
                 { KeyBindType.Left, new Tuple< string, KeyCode, KeyCode, GameObject, GameObject >("Move Left", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Right, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Move Right", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Sprint, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Sprint", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
+                { KeyBindType.Attack, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Attack", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Interact, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Use/Interact", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Drop, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Drop", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
                 { KeyBindType.Throw, new Tuple < string, KeyCode, KeyCode, GameObject, GameObject > ("Throw", KeyCode.None, KeyCode.None, new GameObject(), new GameObject()) },
@@ -92,9 +96,7 @@ namespace ProjectBonsai
         private void InitKeybinds()
         {
             // Init prefabs
-            keybindMenus = new GameObject[2] { keybindMenuMovement, keybindMenuEquipment }; 
-            int[] numElements = new int[2] { keybindMenuMovement.GetComponent<SettingsMenuHeader>().numElements,
-                                             keybindMenuEquipment.GetComponent<SettingsMenuHeader>().numElements };
+            keybindMenus = new GameObject[2] { keybindMenuMovement, keybindMenuEquipment };
             GameObject keybindPrefab_1 = (GameObject)Resources.Load("Prefabs/UI/KeybindRow_1");
             GameObject keybindPrefab_2 = (GameObject)Resources.Load("Prefabs/UI/KeybindRow_2");
             GameObject[] keybindPrefabs = new GameObject[2] { keybindPrefab_2, keybindPrefab_1 };
@@ -117,7 +119,7 @@ namespace ProjectBonsai
                 keybindData[currentKeyBindType] = newTuple;
 
                 // Switch keybind submenu indexing
-                if (numElements[keybindMenuIdx] <= currentMenuIndex + 1)
+                if (SettingsData.keybindMenuLengths[keybindMenuIdx] <= currentMenuIndex + 1)
                 {
                     keybindMenuIdx += 1;
                     currentMenuIndex = 0;
@@ -210,7 +212,7 @@ namespace ProjectBonsai
 
         public void UpdateAllKeybindText()
         {
-            toolHolder.GetComponent<ToolHolder>().itemGrid.GetComponent<ItemGrid>().UpdateAllKeybinds();
+            toolHolder.itemGrid.GetComponent<ItemGrid>().UpdateAllKeybinds();
         }
     }
 }

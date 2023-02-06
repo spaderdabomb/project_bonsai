@@ -88,11 +88,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4384212904278179331}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9d8c3c67a6893e4f94119bda6a35be2, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a2c5577b32e17d44930859dc916f7af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   itemEnum: 1
-  gridParent: {fileID: 0}
   startPosition: {x: 0, y: 0}
 --- !u!223 &-1182407284813567075
 Canvas:

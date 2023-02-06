@@ -1,0 +1,20 @@
+.MyLabel {
+    background-color: rgba(25, 127, 127, 0);
+    width: auto;
+    height: auto;
+    justify-content: center;
+    -unity-text-align: middle-left;
+    white-space: normal;
+    margin-left: 5px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(230, 230, 230);
+    text-shadow: 0 0 0 rgb(0, 0, 0);
+    letter-spacing: 0;
+}
+
+.PlainOffwhiteText {
+    color: rgba(200, 200, 200, 255);
+    -unity-font-style: bold;
+    font-size: 20px;
+}

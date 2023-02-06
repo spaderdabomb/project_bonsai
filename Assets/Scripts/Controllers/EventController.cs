@@ -22,8 +22,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         public delegate void KeyAction(); 
         public static event KeyAction OnKeyPress;
 
-        int currentSpawnIndex = 0;
-
         private void Awake()
         {
             if (Instance)
