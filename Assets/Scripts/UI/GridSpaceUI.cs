@@ -42,7 +42,7 @@ namespace ProjectBonsai.Assets.Scripts.UI
         {
             if (toggleChanged.isOn)
             {
-                GameObject currentEquippedItem = Core.FindChildGameObjectWithTag(GameSceneController.Instance.player.GetComponent<Player>().playerCamera, "ItemEquipped");
+                GameObject currentEquippedItem = Core.FindChildGameObjectWithTag(Player.Instance.playerCamera, "ItemEquipped");
                 Destroy(currentEquippedItem);
                 GameObject itemUI = GetCurrentItemUI();
                 if (itemUI != null)

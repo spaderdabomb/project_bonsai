@@ -20,7 +20,6 @@ using UnityEditor;
 public class FirstPersonController : MonoBehaviour
 {
     private Rigidbody rb;
-    private Player player;
 
     #region Camera Movement Variables
 
@@ -152,7 +151,6 @@ public class FirstPersonController : MonoBehaviour
         crosshairObject = GetComponentInChildren<Image>();
 
         // Set internal variables
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         playerStateBools = new Dictionary<Player.PlayerState, bool>
         {
             {  Player.PlayerState.Idling, true },
@@ -232,13 +230,13 @@ public class FirstPersonController : MonoBehaviour
     private void Update()
     {
         #region Swimming
-        if (player.CurrentPlayerEnvironmentState == Player.PlayerEnvironmentState.InWater)
+        if (Player.Instance.CurrentPlayerEnvironmentState == Player.PlayerEnvironmentState.InWater)
         {
-            player.rb.useGravity = false;
+            Player.Instance.rb.useGravity = false;
         }
         else
         {
-            player.rb.useGravity = true;
+            Player.Instance.rb.useGravity = true;
         }
         #endregion
 
@@ -420,14 +418,14 @@ public class FirstPersonController : MonoBehaviour
             // All movement calculations while sprint is active
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
             {
-                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                if (Player.Instance.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
                 {
                     targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
                 }
                 else
                 {
-                    targetVelocity = player.playerCamera.transform.TransformDirection(targetVelocity) * sprintSpeed * swimSpeedMultiplier;
-                    if (!canExitWater && targetVelocity.y > 0 && player.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
+                    targetVelocity = Player.Instance.playerCamera.transform.TransformDirection(targetVelocity) * sprintSpeed * swimSpeedMultiplier;
+                    if (!canExitWater && targetVelocity.y > 0 && Player.Instance.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
                     {
                         targetVelocity = new Vector3(targetVelocity.x, 0, targetVelocity.z);
                     }
@@ -438,7 +436,7 @@ public class FirstPersonController : MonoBehaviour
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                if (Player.Instance.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
                 {
                     velocityChange.y = 0;
                 }
@@ -476,15 +474,15 @@ public class FirstPersonController : MonoBehaviour
                     sprintBarCG.alpha -= 3 * Time.deltaTime;
                 }
 
-                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                if (Player.Instance.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
                 {
                     targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
                 }
                 else
                 {
                     // Swimming
-                    targetVelocity = player.playerCamera.transform.TransformDirection(targetVelocity) * walkSpeed * swimSpeedMultiplier;
-                    if (!canExitWater && targetVelocity.y > 0 && player.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
+                    targetVelocity = Player.Instance.playerCamera.transform.TransformDirection(targetVelocity) * walkSpeed * swimSpeedMultiplier;
+                    if (!canExitWater && targetVelocity.y > 0 && Player.Instance.waterCollider.transform.position.y > (waterPlaneLevel + swimEyeLevel))
                     {
                         targetVelocity = new Vector3(targetVelocity.x, 0, targetVelocity.z);
                     }
@@ -495,7 +493,7 @@ public class FirstPersonController : MonoBehaviour
                 Vector3 velocityChange = (targetVelocity - velocity);
                 velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
-                if (player.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
+                if (Player.Instance.CurrentPlayerEnvironmentState != Player.PlayerEnvironmentState.InWater)
                 {
                     velocityChange.y = 0;
                 }
@@ -661,14 +659,14 @@ public class FirstPersonController : MonoBehaviour
         {
             if (keyValuePair.Value)
             {
-                player.CurrentPlayerState = keyValuePair.Key;
+                Player.Instance.CurrentPlayerState = keyValuePair.Key;
             }
         }
     }
 
     private void SetWaterPlaneLevel()
     {
-        List<Collider> waterTriggers = player.waterCollider.GetComponent<TriggersInTrigger>().GetList();
+        List<Collider> waterTriggers = Player.Instance.waterCollider.GetComponent<TriggersInTrigger>().GetList();
         foreach (Collider trigger in waterTriggers)
         {
             if (trigger.gameObject.CompareTag("Water"))
@@ -683,7 +681,7 @@ public class FirstPersonController : MonoBehaviour
 
     public void WaterEntered()
     {
-        player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
+        Player.Instance.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
         SetWaterPlaneLevel();
     }
 
@@ -691,12 +689,12 @@ public class FirstPersonController : MonoBehaviour
     {
         if (isGrounded)
         {
-            player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.OnLand;
+            Player.Instance.CurrentPlayerEnvironmentState = PlayerEnvironmentState.OnLand;
             canExitWater = true;
         }
         else
         {
-            player.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
+            Player.Instance.CurrentPlayerEnvironmentState = PlayerEnvironmentState.InWater;
             SetWaterPlaneLevel();
         }
     }

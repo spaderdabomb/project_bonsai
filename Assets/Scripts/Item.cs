@@ -10,17 +10,12 @@ public class Item : MonoBehaviour
     [SerializeField] public ItemData.ItemStruct itemStruct;
     [SerializeField] public int itemQuantity = 1;
 
-    [HideInInspector] protected GameObject player_go;
-    [HideInInspector] protected Player player;
-
     private string itemName;
 
     void Start()
     {
         itemStruct = ItemData.itemDict[itemEnum];
         itemName = itemStruct.name;
-        player_go = GameObject.FindGameObjectWithTag("Player");
-        player = player_go.GetComponent<Player>();
     }
 
     public void SetNumItem(int _itemQuantity)

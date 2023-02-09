@@ -20,7 +20,6 @@ namespace ProjectBonsai
         [SerializeField] public TextMeshProUGUI healthText;
 
         [HideInInspector] GameObject itemSpawns;
-        [HideInInspector] GameObject player;
         [HideInInspector] Camera playerCamera;
         [HideInInspector] string terrainItemName;
         [HideInInspector] float healthbarStartWidth;
@@ -37,8 +36,7 @@ namespace ProjectBonsai
             terrainItemStruct = TerrainData.terrainItemDict[terrainItemEnum];
             terrainItemName = terrainItemStruct.baseName;
             itemSpawns = Core.FindGameObjectByNameAndTag("ItemSpawns", "ItemSpawns");
-            player = GameObject.FindGameObjectWithTag("Player");
-            playerCamera = player.GetComponent<Player>().playerCamera.GetComponent<Camera>();
+            playerCamera = Player.Instance.playerCamera.GetComponent<Camera>();
 
             Vector3 screenPoint = playerCamera.WorldToScreenPoint(labelPosition_go.transform.position);
             healthBar.transform.position = screenPoint;
@@ -115,7 +113,7 @@ namespace ProjectBonsai
         {
             GameObject particleHit = Resources.Load<GameObject>(GlobalData.particlesPrefabPath + this.terrainItemStruct.particleHitName);
             GameObject particleSystem_go = Instantiate(particleHit, playerCamera.transform);
-            particleSystem_go.transform.localPosition = player.GetComponent<Player>().weaponCollider.center;
+            particleSystem_go.transform.localPosition = Player.Instance.weaponCollider.center;
 
             currentHealth -= damage;
             PositionHealthLabel();

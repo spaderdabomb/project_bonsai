@@ -12,51 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cca780a44e3bd6f4e8f92d48d0d19187, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  playerLevel: 0
-  matchLevel: 0
-  healthCurrent: 0
-  healthMax: 0
-  manaCurrent: 0
-  manaMax: 0
-  speedCurrent: 0
-  speedMax: 0
-  airCurrent: 0
-  airMax: 0
-  staminaCurrent: 0
-  staminaMax: 0
-  jumpCurrent: 0
-  jumpMax: 0
-  baseDamage: 0
-  baseCritChance: 0
-  baseCritMultiplier: 0
-  baseDefense: 0
-  woodcuttingLevelMax: 0
-  woodcuttingLevelCurrent: 0
-  woodcuttingExp: 0
-  harpooningLevelMax: 0
-  harpooningLevelCurrent: 0
-  harpooningExp: 0
-  miningLevelMax: 0
-  miningLevelCurrent: 0
-  miningExp: 0
-  cookingLevelMax: 0
-  cookingLevelCurrent: 0
-  cookingExp: 0
-  farmingLevelMax: 0
-  farmingLevelCurrent: 0
-  farmingExp: 0
-  staminaLevelMax: 0
-  staminaLevelCurrent: 0
-  staminaExp: 0
-  stealthLevelMax: 0
-  stealthLevelCurrent: 0
-  stealthExp: 0
-  meleeLevelMax: 0
-  meleeLevelCurrent: 0
-  meleeExp: 0
-  rangeLevelMax: 0
-  rangeLevelCurrent: 0
-  rangeExp: 0
-  magicLevelMax: 0
-  magicLevelCurrent: 0
-  magicExp: 0
+  <PlayerLevel>k__BackingField: 1
+  <MatchLevel>k__BackingField: 1
+  <HealthCurrent>k__BackingField: 100
+  <HealthMax>k__BackingField: 100
+  <ManaCurrent>k__BackingField: 50
+  <ManaMax>k__BackingField: 50
+  <SpeedCurrent>k__BackingField: 4
+  <SpeedMax>k__BackingField: 4
+  <AirCurrent>k__BackingField: 100
+  <AirMax>k__BackingField: 100
+  <StaminaCurrent>k__BackingField: 100
+  <StaminaMax>k__BackingField: 100
+  <JumpCurrent>k__BackingField: 100
+  <JumpMax>k__BackingField: 100
+  <BaseDamage>k__BackingField: 0
+  <BaseCritChance>k__BackingField: 0
+  <BaseCritMultiplier>k__BackingField: 0
+  <BaseDefense>k__BackingField: 0
+  WoodcuttingData: {fileID: 11400000, guid: 33d5e3047a165d0459602c1c87de3990, type: 2}
+  FishingData: {fileID: 11400000, guid: 51e176bb4ed2eab42b79588470835975, type: 2}
+  MiningData: {fileID: 11400000, guid: 78592596b4c7fdf4e80be5d1f1973e73, type: 2}

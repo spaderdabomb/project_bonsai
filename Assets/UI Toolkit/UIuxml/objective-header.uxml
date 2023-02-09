@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="objective-header" style="flex-direction: row; position: relative; align-items: flex-end; right: 0; width: 330px; justify-content: flex-end;">
+        <ui:VisualElement name="header-container" style="position: relative; width: 330px; height: 40px; background-color: rgba(0, 0, 0, 0.39); right: auto; flex-direction: row; justify-content: flex-start; align-items: center;">
+            <ui:VisualElement name="header-symbol" style="background-image: resource(&apos;Photoshop/UIIcons/objectiveNotification&apos;); width: 30px; height: 30px; margin-left: 5px;" />
+            <ui:Label text="Skill Progression" display-tooltip-when-elided="true" name="header-label" class="MyLabel" style="margin-right: 5px; margin-top: 0; margin-bottom: 0; margin-left: 10px; text-shadow: 1px 1px 0 rgb(0, 0, 0);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

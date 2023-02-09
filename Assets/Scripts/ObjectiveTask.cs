@@ -8,22 +8,27 @@ using UnityEngine;
 public class ObjectiveTask
 {
     public string ObjectiveName { get; private set; }
-    public string ObjectiveDescription { get; private set; }
-    public List<ObjectiveSubTask> ObjectiveSubTasks { get; private set; } 
+    public List<ObjectiveSubTask> ObjectiveSubTasks { get; private set; }
 
-    public ObjectiveTask(List<ObjectiveSubTask> objectiveSubTasks)
+    public ObjectiveTask(string objectiveName, List<ObjectiveSubTask> objectiveSubTasks)
     {
+        ObjectiveName = objectiveName;
         ObjectiveSubTasks = objectiveSubTasks;
     }
 
-    public virtual void OnTaskStart() { }
-    public virtual void OnTaskFinish() { }
-    public virtual bool IsTaskCompleted() { return false; }
+    public void OnTaskStart() 
+    {
+        UIManager.Instance.objectivesUI.GetComponent<ObjectivesUI>().ClearUI();
+        UIManager.Instance.objectivesUI.GetComponent<ObjectivesUI>().InitNewObjectiveUI(ObjectiveName, ObjectiveSubTasks);
+    }
+
+    public void OnTaskFinish() { }
+    public bool IsTaskCompleted() { return false; }
 }
 
 public abstract class ObjectiveSubTask
 {
-    public string ObjectiveDescription { get; private set; }
+    public virtual string ObjectiveDescription { get; set; }
 
     public virtual void OnSubTaskStart() { }
     public virtual void OnSubTaskFinish() { }
@@ -32,23 +37,20 @@ public abstract class ObjectiveSubTask
 
 public class SkillProgressionTask : ObjectiveSubTask
 {
-    public Type SkillType { get; private set; }
-    public string SkillDisplayName { get; private set; }
+    public SkillData.SkillType SkillEnum { get; private set; }
     public int TargetLevel { get; private set; }
 
-    public SkillProgressionTask(Type skillType, int targetLevel)
+    public SkillProgressionTask(string objectiveDescription, SkillData.SkillType skillEnum, int targetLevel)
     {
-        SkillType = skillType;
+        ObjectiveDescription = objectiveDescription;
+        SkillEnum = skillEnum;
         TargetLevel = targetLevel;
-        SkillDisplayName = GameSceneController.Instance.skillDict[SkillData.SkillType.Woodcutting].SkillName;
-        Debug.Log(SkillDisplayName);
+        Debug.Log(Player.Instance.playerData.WoodcuttingData.SkillName);
     }
 
     public override void OnSubTaskStart()
     {
         base.OnSubTaskStart();
-        Debug.Log("task started");
-        Debug.Log("task started"+this.SkillType.ToString()+this.TargetLevel.ToString());
     }
 }
 
@@ -57,8 +59,9 @@ public class LandmarkTask : ObjectiveSubTask
     public Vector3 TargetPosition { get; private set; }
     public float Distance { get; private set; }
 
-    public LandmarkTask(Vector3 targetPosition, float distance)
+    public LandmarkTask(string objectiveDescription, Vector3 targetPosition, float distance)
     {
+        ObjectiveDescription = objectiveDescription;
         TargetPosition = targetPosition;
         Distance = distance;
     }

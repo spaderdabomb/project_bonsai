@@ -5,64 +5,32 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerData", menuName = "ScriptableObjects/Player", order = 1)]
 public class PlayerData : ScriptableObject
 {
-    [Header("Player Attributes")]
+    [field: Header("Damage Data")]
+    [field: SerializeField] public float PlayerLevel { get; set; }
+    [field: SerializeField] public float MatchLevel { get; set; }
+    [field: SerializeField] public float HealthCurrent { get; set; }
+    [field: SerializeField] public float HealthMax { get; set; }
+    [field: SerializeField] public float ManaCurrent { get; set; }
+    [field: SerializeField] public float ManaMax { get; set; }
+    [field: SerializeField] public float SpeedCurrent { get; set; }
+    [field: SerializeField] public float SpeedMax { get; set; }
+    [field: SerializeField] public float AirCurrent { get; set; }
+    [field: SerializeField] public float AirMax { get; set; }
+    [field: SerializeField] public float StaminaCurrent { get; set; }
+    [field: SerializeField] public float StaminaMax { get; set; }
+    [field: SerializeField] public float JumpCurrent { get; set; }
+    [field: SerializeField] public float JumpMax { get; set; }
 
-    public float playerLevel;
-    public float matchLevel;
-    public float healthCurrent;
-    public float healthMax;
-    public float manaCurrent;
-    public float manaMax;
-    public float speedCurrent;
-    public float speedMax;
-    public float airCurrent;
-    public float airMax;
-    public float staminaCurrent;
-    public float staminaMax;
-    public float jumpCurrent;
-    public float jumpMax;
+    [field: Header("Damage Data")]
 
-    [Header("Damage Data")]
-
-    public float baseDamage;
-    public float baseCritChance;
-    public float baseCritMultiplier;
-    public float baseDefense;
+    [field: SerializeField] public float BaseDamage { get; set; }
+    [field: SerializeField] public float BaseCritChance { get; set; }
+    [field: SerializeField] public float BaseCritMultiplier { get; set; }
+    [field: SerializeField] public float BaseDefense { get; set; }
 
     [Header("Level Data")]
 
-    public float woodcuttingLevelMax;
-    public float woodcuttingLevelCurrent;
-    public float woodcuttingExp;
-    public float harpooningLevelMax;
-    public float harpooningLevelCurrent;
-    public float harpooningExp;
-    public float miningLevelMax;
-    public float miningLevelCurrent;
-    public float miningExp;
-    public float cookingLevelMax;
-    public float cookingLevelCurrent;
-    public float cookingExp;
-    public float farmingLevelMax;
-    public float farmingLevelCurrent;
-    public float farmingExp;
-    public float staminaLevelMax;
-    public float staminaLevelCurrent;
-    public float staminaExp;
-    public float stealthLevelMax;
-    public float stealthLevelCurrent;
-    public float stealthExp;
-    public float meleeLevelMax;
-    public float meleeLevelCurrent;
-    public float meleeExp;
-    public float rangeLevelMax;
-    public float rangeLevelCurrent;
-    public float rangeExp;
-    public float magicLevelMax;
-    public float magicLevelCurrent;
-    public float magicExp;
-    void Start()
-    {
-        
-    }
+    public WoodcuttingSkill WoodcuttingData;
+    public FishingSkill FishingData;
+    public MiningSkill MiningData;
 }

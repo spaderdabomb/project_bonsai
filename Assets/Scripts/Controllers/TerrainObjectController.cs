@@ -10,8 +10,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
 
         [HideInInspector] public GameObject treeTerrainObjectHolder;
         [HideInInspector] public List<GameObject> treeTerrainObjects;
-        [HideInInspector] public GameObject player_go;
-        [HideInInspector] public Player player;
 
         private void Awake()
         {
@@ -28,8 +26,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         {
             treeTerrainObjectHolder = Core.FindGameObjectByNameAndTag("Trees", "TerrainObjectHolder");
             treeTerrainObjects = new List<GameObject>();
-            player_go = GameObject.FindGameObjectWithTag("Player");
-            player = player_go.GetComponent<Player>();
 
             for (int i = 0; i < treeTerrainObjectHolder.transform.childCount; i++)
             {

@@ -35,8 +35,6 @@ namespace ProjectBonsai.AI
         public float maxTurnAngle = 120f;
         public float turnRadius = 90f;
 
-        [HideInInspector] public GameObject player_go;
-        [HideInInspector] public Player player;
         [HideInInspector] public float runSpeed;
 
         private bool pathIndexChanged = false;
@@ -103,9 +101,6 @@ namespace ProjectBonsai.AI
         {
             InitSOvalues();
 
-            player_go = GameObject.FindGameObjectWithTag("Player");
-            player = player_go.GetComponent<Player>();
-
             agent = GetComponent<NavMeshAgent>();
             agent.updateRotation = true;
             agent.updatePosition = true;
@@ -114,11 +109,14 @@ namespace ProjectBonsai.AI
             agent.velocity = Vector3.zero;
             agent.speed = aiData.BaseSpeed;
             runSpeed = aiData.BaseSpeed * aiData.RunSpeedMultiplier;
+        }
 
+        private void Start()
+        {
             currentPath = new NavMeshPath();
 
             itemSpawns = Core.FindGameObjectByNameAndTag("ItemSpawns", "ItemSpawns");
-            playerCamera = player.playerCamera.GetComponent<Camera>();
+            playerCamera = Player.Instance.playerCamera.GetComponent<Camera>();
 
             Vector3 screenPoint = playerCamera.WorldToScreenPoint(labelPosition_go.transform.position);
             healthBar.transform.position = screenPoint;
@@ -133,10 +131,6 @@ namespace ProjectBonsai.AI
             aiData.aiType.aiEnum = AiType.AiEnum.Boar;
         }
 
-        void Start()
-        {
-
-        }
 
         // Update is called once per frame
         void Update()
@@ -319,7 +313,7 @@ namespace ProjectBonsai.AI
 
         private void SetAggression()
         {
-            if (Vector3.Distance(player_go.transform.position, transform.position) <= aiData.aggressionEnterRange && !StateController.IsStateActive<AiSprintState>())
+            if (Vector3.Distance(Player.Instance.transform.position, transform.position) <= aiData.aggressionEnterRange && !StateController.IsStateActive<AiSprintState>())
             {
                 List<State> activeState = StateController.ActiveStates;
                 StateController.TransitionToState<AiSprintState>(activeState[0]);
@@ -328,7 +322,7 @@ namespace ProjectBonsai.AI
                     createNewPath = true;
                 }
             }
-            else if (Vector3.Distance(player_go.transform.position, transform.position) >= aiData.aggressionExitRange && !StateController.IsStateActive<AiWalkState>() && !StateController.IsStateActive<AiIdleState>())
+            else if (Vector3.Distance(Player.Instance.transform.position, transform.position) >= aiData.aggressionExitRange && !StateController.IsStateActive<AiWalkState>() && !StateController.IsStateActive<AiIdleState>())
             {
                 List<State> activeState = StateController.ActiveStates;
                 StateController.TransitionToState<AiWalkState>(activeState[0]);
@@ -574,7 +568,7 @@ namespace ProjectBonsai.AI
         {
             GameObject particleHit = aiData.ParticleHitName;
             GameObject particleSystem_go = Instantiate(particleHit, playerCamera.transform);
-            particleSystem_go.transform.localPosition = player.GetComponent<Player>().weaponCollider.center;
+            particleSystem_go.transform.localPosition = Player.Instance.weaponCollider.center;
 
             currentHealth -= damage;
             PositionHealthLabel();

@@ -11,8 +11,7 @@ namespace ProjectBonsai
         Dictionary<WeaponAnimState, string> animStateDict;
         void Start()
         {
-            player_go = GameObject.FindGameObjectWithTag("Player");
-            player = player_go.GetComponent<Player>();
+
             anim = gameObject.GetComponent<Animator>();
             animStateDict = new Dictionary<WeaponAnimState, string>()
             {
@@ -35,40 +34,40 @@ namespace ProjectBonsai
         protected override void Animate()
         {
             // Comnbat states
-            if (player.GetComponent<Player>().CurrentPlayerCombatState == Player.PlayerCombatState.Attacking)
+            if (Player.Instance.CurrentPlayerCombatState == Player.PlayerCombatState.Attacking)
             {
                 SetAnimState(WeaponAnimState.Attacking);
                 anim.speed = 1;
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Idling)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.Idling)
             {
                 SetAnimState(WeaponAnimState.Idling);
                 anim.speed = 1;
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Walking)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.Walking)
             {
                 SetAnimState(WeaponAnimState.Walking);
                 anim.speed = 1;
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Sprinting)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.Sprinting)
             {
                 SetAnimState(WeaponAnimState.Sprinting);
-                anim.speed = player.GetComponent<Player>().fpController.sprintSpeed / player.GetComponent<Player>().fpController.walkSpeed;
+                anim.speed = Player.Instance.fpController.sprintSpeed / Player.Instance.fpController.walkSpeed;
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Jumping)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.Jumping)
             {
                 SetAnimState(WeaponAnimState.Jumping);
                 anim.speed = 1;
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.Crouching)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.Crouching)
             {
                 SetAnimState(WeaponAnimState.Crouching);
-                anim.speed = 1f - 0.75f*(player.GetComponent<Player>().fpController.speedReduction / player.GetComponent<Player>().fpController.walkSpeed);
+                anim.speed = 1f - 0.75f*(Player.Instance.fpController.speedReduction / Player.Instance.fpController.walkSpeed);
             }
-            else if (player.GetComponent<Player>().CurrentPlayerState == Player.PlayerState.CrouchWalking)
+            else if (Player.Instance.CurrentPlayerState == Player.PlayerState.CrouchWalking)
             {
                 SetAnimState(WeaponAnimState.CrouchWalking);
-                anim.speed = 1f - 0.75f * (player.GetComponent<Player>().fpController.speedReduction / player.GetComponent<Player>().fpController.walkSpeed);
+                anim.speed = 1f - 0.75f * (Player.Instance.fpController.speedReduction / Player.Instance.fpController.walkSpeed);
             }
         }
 
@@ -101,12 +100,12 @@ namespace ProjectBonsai
 
         public void AttackAnimationFinished()
         {
-            player.GetComponent<Player>().CurrentPlayerCombatState = Player.PlayerCombatState.Idling;
+            Player.Instance.CurrentPlayerCombatState = Player.PlayerCombatState.Idling;
         }
 
         public void AxeHit()
         {
-            player.OnAttackHitFrame();
+            Player.Instance.OnAttackHitFrame();
         }
     }
 }

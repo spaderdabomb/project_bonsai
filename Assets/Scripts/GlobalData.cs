@@ -415,18 +415,25 @@ public static class TerrainData
 
 public static class ObjectiveData
 {
-    public static List<ObjectiveTask> objectiveDataList; // currently only has objectives for a single level
+    public static List<List<ObjectiveTask>> objectiveDataList;
 
     static ObjectiveData()
     {
-        // Single level objectives
-        objectiveDataList = new List<ObjectiveTask>()
-        {
-            new ObjectiveTask(new List<ObjectiveSubTask>() 
-            { 
-                new SkillProgressionTask(typeof(WoodcuttingSkill), 5), new LandmarkTask(Vector3.zero, 10f) 
-            })
-        };
+        objectiveDataList = new List<List<ObjectiveTask>>();
+
+        // Level 1
+        SkillProgressionTask subtask_1_1 = new SkillProgressionTask("1/2 - Reach lv. 2 woodcutting", SkillData.SkillType.Woodcutting, 5);
+        LandmarkTask subtask_1_2 = new LandmarkTask("0/1 - Visit Frost-tip forest", Vector3.zero, 10f);
+        ObjectiveTask task_1 = new ObjectiveTask("Skill Progression", new List<ObjectiveSubTask>() { subtask_1_1, subtask_1_2 });
+        List<ObjectiveTask> tasklist_1 = new List<ObjectiveTask>() { task_1 };
+        objectiveDataList.Add(tasklist_1);
+
+        // Level 2
+        SkillProgressionTask subtask_2_1 = new SkillProgressionTask("1/2 - Reach lv. 2 woodcutting", SkillData.SkillType.Woodcutting, 10);
+        LandmarkTask subtask_2_2 = new LandmarkTask("0/1 - Visit Frost-tip forest", Vector3.zero, 10f);
+        ObjectiveTask task_2 = new ObjectiveTask("Skill Progression", new List<ObjectiveSubTask>() { subtask_1_1, subtask_1_2 });
+        List<ObjectiveTask> tasklist_2 = new List<ObjectiveTask>() { task_2 };
+        objectiveDataList.Add(tasklist_2);
     }
 }
 

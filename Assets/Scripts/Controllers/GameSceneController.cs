@@ -13,17 +13,15 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
     public class GameSceneController : MonoBehaviour
     {
         public static GameSceneController Instance;
-        [SerializeField] public GameObject player;
         [SerializeField] GameObject SettingsMenuController;
         [SerializeField] public GameObject mainMenu, settingsMenu;
         [SerializeField] public GameObject dimBg;
         [SerializeField] public GameObject toolHolder_go, inventory, craftingMenu, playerMenu;
         [SerializeField] public Camera mainCamera;
 
-        public Dictionary<SkillData.SkillType, PlayerSkill> skillDict;
-
         [HideInInspector] public ToolHolder toolHolder;
         [HideInInspector] public GameState currentGameState;
+        [HideInInspector] public ObjectiveTask currentObjectiveTask;
 
         private void Awake()
         {
@@ -37,13 +35,6 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         }
         void Start()
         {
-            skillDict = new Dictionary<SkillData.SkillType, PlayerSkill>()
-            {
-                { SkillData.SkillType.Woodcutting, ScriptableObject.CreateInstance<WoodcuttingSkill>() },
-                { SkillData.SkillType.Mining, ScriptableObject.CreateInstance<MiningSkill>() },
-                { SkillData.SkillType.Fishing, ScriptableObject.CreateInstance<FishingSkill>() },
-            };
-
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
 
@@ -53,12 +44,13 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             toolHolder = toolHolder_go.GetComponent<ToolHolder>();
             currentGameState = GameState.Playing;
 
-            ObjectiveData.objectiveDataList[0].OnTaskStart();
+            currentObjectiveTask = ObjectiveData.objectiveDataList[LevelManager.Instance.levelNum][0];
+            currentObjectiveTask.OnTaskStart();
         }
 
         void Update()
         {
-
+            // print("hello");
         }
 
         public void ChangeMenu(string menuName)
@@ -86,7 +78,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 dimBg.SetActive(true);
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
-                player.GetComponent<FirstPersonController>().enabled = false;
+                Player.Instance.fpController.enabled = false;
                 currentGameState = GameState.Settings;
             }
             else if (settingsMenu.activeSelf)
@@ -96,7 +88,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
                 dimBg.SetActive(true);
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
-                player.GetComponent<FirstPersonController>().enabled = false;
+                Player.Instance.fpController.enabled = false;
                 currentGameState = GameState.Settings;
             }
             else
@@ -121,13 +113,13 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
         {
             if (keybindType == SettingsData.KeyBindType.Interact)
             {
-                player.GetComponent<Player>().Interact();
+                Player.Instance.Interact();
             }
             else if (keybindType == SettingsData.KeyBindType.Attack)
             {
                 if (currentGameState == GameState.Playing) 
                 {
-                    player.GetComponent<Player>().StartAttack();
+                    Player.Instance.StartAttack();
                 }
             }
             else if (Core.Contains(SettingsData.inventoryKeyBindTypes, keybindType))
@@ -138,21 +130,17 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             }
             else if (keybindType == SettingsData.KeyBindType.ShowInventory)
             {
-/*                bool activeState = !inventory.GetComponent<Canvas>().enabled;
-                inventory.GetComponent<Canvas>().enabled = activeState;
-                craftingMenu.GetComponent<Canvas>().enabled = activeState;
-                playerMenu.GetComponent<Canvas>().enabled = activeState;*/
-
                 bool activeState = !inventory.GetComponent<CanvasGroup>().interactable;
                 Core.SetCanvasGroupState(inventory.GetComponent<CanvasGroup>(), activeState);
                 Core.SetCanvasGroupState(craftingMenu.GetComponent<CanvasGroup>(), activeState);
                 Core.SetCanvasGroupState(playerMenu.GetComponent<CanvasGroup>(), activeState);
+                UIManager.Instance.SetGameSceneUIState(!activeState);
 
                 if (inventory.GetComponent<CanvasGroup>().interactable)
                 {
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
-                    player.GetComponent<FirstPersonController>().enabled = false;
+                    Player.Instance.fpController.enabled = false;
                     CraftingMenuController.Instance.ShowCraftingSubMenu(CraftingMenuController.Instance.GetCurrentSelectedItemToggle());
                     currentGameState = GameState.Crafting;
                 }
@@ -168,7 +156,7 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             if (ItemData.weaponDict.ContainsKey(itemEnum))
             {
                 GameObject itemPrefab = Resources.Load<GameObject>(GlobalData.equippedItemsPrefabPath + ItemData.weaponDict[itemEnum].equippedName);
-                Instantiate(itemPrefab, player.GetComponent<Player>().playerCamera.transform);
+                Instantiate(itemPrefab, Player.Instance.playerCamera.transform);
             }
         }
 
@@ -179,8 +167,9 @@ namespace ProjectBonsai.Assets.Scripts.Controllers
             dimBg.SetActive(false);
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            player.GetComponent<FirstPersonController>().enabled = true;
+            Player.Instance.fpController.enabled = true;
             currentGameState = GameState.Playing;
+            UIManager.Instance.SetGameSceneUIState(true);
         }
 
         /// <summary>

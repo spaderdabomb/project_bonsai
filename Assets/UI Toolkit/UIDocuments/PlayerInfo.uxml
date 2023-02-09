@@ -1,27 +1,29 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI%20Toolkit/UICSS/MyLabel.uss?fileID=7433441132597879392&amp;guid=a84865d10169d6d48bb0d03bf5951718&amp;type=3#MyLabel" />
-    <ui:VisualElement style="flex-grow: 1; position: relative; bottom: auto; height: auto; width: auto;">
-        <ui:VisualElement style="bottom: 11px; position: absolute; height: 85px; top: auto; width: 175px; left: 427px; justify-content: flex-end; align-items: center; font-size: 20px;">
-            <ui:Label text="30" display-tooltip-when-elided="true" name="currentAmmoRemaining" class="MyLabel PlainOffwhiteText" style="font-size: 26px;" />
+    <Style src="project://database/Assets/UI%20Toolkit/UIcss/MyLabel.uss?fileID=7433441132597879392&amp;guid=a84865d10169d6d48bb0d03bf5951718&amp;type=3#MyLabel" />
+    <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; position: relative; bottom: auto; height: auto; width: auto;">
+        <ui:VisualElement name="weapon-info" style="bottom: 11px; position: absolute; height: 85px; top: auto; width: 175px; left: 427px; justify-content: flex-end; align-items: center; font-size: 20px;">
+            <ui:Label text="30" display-tooltip-when-elided="true" name="ammo-remaining-clip" class="MyLabel PlainOffwhiteText" style="font-size: 26px;" />
             <ui:VisualElement style="background-color: rgb(200, 200, 200); height: 1px; width: 50px;" />
             <ui:VisualElement style="flex-grow: 1; flex-direction: row; -unity-text-align: middle-left; justify-content: center; align-items: center; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-                <ui:Label text="149" display-tooltip-when-elided="true" name="totalAmmoRemaining" class="MyLabel PlainOffwhiteText" style="font-size: 24px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
-                <ui:VisualElement name="ammoType" style="background-image: resource(&apos;Photoshop/UIIcons/ammoRifle&apos;); width: 30px; height: 31px; margin-left: 10px;" />
+                <ui:Label text="149" display-tooltip-when-elided="true" name="ammo-remaining-total" class="MyLabel PlainOffwhiteText" style="font-size: 24px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                <ui:VisualElement name="ammo-type" style="background-image: resource(&apos;Photoshop/UIIcons/ammoRifle&apos;); width: 30px; height: 31px; margin-left: 10px;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement style="width: 300px; position: absolute; bottom: 20px; height: 70px; left: 20px; margin-top: 5px; flex-direction: column-reverse;">
-            <ui:VisualElement style="justify-content: center; align-items: flex-start; flex-direction: row; position: relative; margin-top: 10px;">
-                <ui:VisualElement style="background-image: resource(&apos;Photoshop/UIIcons/manaIcon&apos;); width: 20px; height: 20px; position: relative;" />
-                <ui:VisualElement style="background-image: resource(&apos;Photoshop/UIIcons/manaBar&apos;); width: 280px; height: 20px; margin-left: 10px;" />
+        <ui:VisualElement name="player-info" style="width: 300px; position: absolute; bottom: 20px; height: 70px; left: 20px; margin-top: 5px; flex-direction: column-reverse;">
+            <ui:VisualElement style="justify-content: flex-start; align-items: flex-start; flex-direction: row; position: relative; margin-top: 10px;">
+                <ui:VisualElement style="position: absolute; background-image: resource(&apos;Photoshop/UIIcons/barBackground&apos;); width: 273px; height: 20px; background-color: rgba(0, 0, 0, 0); top: 1px; -unity-background-image-tint-color: rgba(0, 0, 0, 0.59); left: 29px; bottom: -2px; margin-left: 0;" />
+                <ui:VisualElement name="mana-icon" style="background-image: resource(&apos;Photoshop/UIIcons/manaIcon&apos;); width: 20px; height: 20px; position: relative;" />
+                <ui:VisualElement name="mana-bar" style="background-image: resource(&apos;Photoshop/UIIcons/manaBar&apos;); width: 280px; height: 20px; margin-left: 10px; align-items: flex-start;" />
             </ui:VisualElement>
-            <ui:VisualElement style="justify-content: center; align-items: flex-start; flex-direction: row; position: relative;">
-                <ui:VisualElement style="background-image: resource(&apos;Photoshop/UIIcons/heartIcon&apos;); width: 20px; height: 20px; position: relative;" />
-                <ui:VisualElement style="background-image: resource(&apos;Photoshop/UIIcons/healthBar&apos;); width: 280px; height: 20px; margin-left: 10px;" />
+            <ui:VisualElement style="justify-content: flex-start; align-items: flex-start; flex-direction: row; position: relative;">
+                <ui:VisualElement style="position: absolute; background-image: resource(&apos;Photoshop/UIIcons/barBackground&apos;); width: 273px; height: 20px; background-color: rgba(0, 0, 0, 0); top: 1px; -unity-background-image-tint-color: rgba(0, 0, 0, 0.59); left: 29px; bottom: -2px; margin-left: 0; right: -1px;" />
+                <ui:VisualElement name="health-icon" style="background-image: resource(&apos;Photoshop/UIIcons/heartIcon&apos;); width: 20px; height: 20px; position: relative;" />
+                <ui:VisualElement name="health-bar" style="background-image: resource(&apos;Photoshop/UIIcons/healthBar&apos;); width: 280px; height: 20px; margin-left: 10px; align-items: flex-start;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement style="position: absolute; bottom: 10px; height: 89px; width: 100px; left: 1320px; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 0;">
+    <ui:VisualElement name="inventory-ve" style="position: absolute; bottom: 10px; height: 89px; width: 100px; left: 1320px; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 0;">
         <ui:VisualElement style="background-image: resource(&apos;Photoshop/UIIcons/inventoryIcon&apos;); width: 50px; height: 50px; position: relative;" />
-        <ui:Label text="TAB" display-tooltip-when-elided="true" name="keybindInventory" class="PlainOffwhiteText" style="-unity-text-align: lower-center; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: center;" />
+        <ui:Label text="TAB" display-tooltip-when-elided="true" name="inventory-keybind-label" class="PlainOffwhiteText" style="-unity-text-align: lower-center; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: center;" />
     </ui:VisualElement>
 </ui:UXML>

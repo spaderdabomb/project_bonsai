@@ -8,6 +8,8 @@ using ProjectBonsai.Assets.Scripts.UI;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance;
+
     [SerializeField] GameObject interactPopup;
     [SerializeField] public GameObject playerCamera;
     [SerializeField] public CapsuleCollider weaponCollider;
@@ -29,7 +31,13 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-
+        if (Instance)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        DontDestroyOnLoad(gameObject);
+        Instance = this;
     }
 
     void Start()
